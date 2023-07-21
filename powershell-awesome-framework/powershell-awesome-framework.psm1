@@ -2,21 +2,21 @@
 # E.g., Import-Module SomeModule
 
 # Function to read JSON configuration file
-function Read-PAFConfiguration {
+function Get-PAFConfiguration {
     param (
         [Parameter(Position = 0)]
         [string]$configFilePath = (Join-Path $PSScriptRoot 'config.json')
     )
 
-    Write-Verbose ((Join-Path $PSScriptRoot 'config.json') | Out-String) -Verbose
+    Write-Verbose ((Join-Path $PSScriptRoot 'config.json') | Out-String)
 
     if (-not (Test-Path $configFilePath)) {
         Write-Warning "Configuration file not found. Using default values."
         return @{
             "FrameworkName"       = "PowerShell Awesome Framework"
-            "DefaultModulePath"   = "${PSScriptRoot}\\Snippets\\core"
-            "SnippetsPath"        = "${PSScriptRoot}\\snippets\\user"
-            "UserSnippetsPath"    = "${PSScriptRoot}\\Snippets\\user"
+            "DefaultModulePath"   = $PSScriptRoot
+            "SnippetsPath"        = "${PSScriptRoot}\snippets\core"
+            "UserSnippetsPath"    = "${PSScriptRoot}\snippets\user"
             "UseColorOutput"      = true
             "MaxSnippetsPerPage"  = 10
             "ShowBannerOnStartup" = true
@@ -50,17 +50,15 @@ function Get-PAFSnippets {
     param (
         [Parameter(ValueFromPipeline = $true, Position = 0)]
         [ValidateNotNullOrEmpty()]
-        [PSObject]$ConfigData
+        [PSObject]$ConfigData = (get-PAFConfiguration)
     )
-    <#     begin {
-        
-    }
- #>    process {
+
+    process {
         # Get the snippets path from the configuration
         $snippetsPath = $ConfigData.SnippetsPath
 
-        Write-Verbose ($ConfigData | Out-String) -Verbose
-        Write-Verbose ($snippetsPath | Out-String) -Verbose
+        Write-Verbose ($ConfigData | Out-String)
+        Write-Verbose ($snippetsPath | Out-String)
 
         # Ensure the snippets path is valid
         if (-not (Test-Path -Path $snippetsPath -PathType Container)) {
@@ -69,14 +67,30 @@ function Get-PAFSnippets {
         }
 
         # Get all snippet files in the snippets directory
-        $snippetFiles = Get-ChildItem -Path $snippetsPath -Filter "*.ps1" -File
+        $snippetFiles = Get-ChildItem -Path $snippetsPath -Filter "$($ConfigData.FrameworkPrefix)*.ps1" -File
 
         # Initialize an array to store snippet metadata
         $snippetsMetadata = @()
-
+        Write-Verbose ($snippetsMetadata | Out-String)
         # Loop through each snippet file and extract metadata
         foreach ($file in $snippetFiles) {
-            $metadata = Get-Help -Path $file.FullName -Category Function | Select-Object -Property Name, Synopsis, Description, Category
+            Try {
+                . $file.FullName
+            }
+            Catch {
+                Write-Error -Message "Failed to import file $($file.FullName): $_"
+            }
+            
+
+            $functionName = $file.FullName -replace($ConfigData.FrameworkPrefix, "")
+            $functionName = $functionName -replace(".ps1", "")
+            #$functionName
+            Write-Verbose ($file | Out-String) -Verbose
+
+            $functionScriptBlock = (Get-Command (split-path $functionName -Leaf)).ScriptBlock
+            $category = Get-PAFScriptBlockCategory -ScriptBlock $functionScriptBlock
+
+            $metadata = Get-Help (split-path $functionName -Leaf) -Category Function | Select-Object -Property Name, Synopsis, @{l="Description";e={$_.Description.text}}, @{l="Category"; e={$category}}
             $snippetsMetadata += $metadata
         }
 
@@ -123,14 +137,14 @@ function Show-PAFSnippetMenu {
     )
 
     # Define the naming convention for your snippets
-    $frameworkPrefix = "FrameworkName_"
+    $frameworkPrefix = $((Get-PAFConfiguration).FrameworkPrefix)
 
     # Retrieve available commands (functions) from loaded modules
     $availableCommands = Get-Command | Where-Object { $_.CommandType -eq "Function" }
 
     # Filter commands to include only snippets specific to your framework based on naming convention
     $snippets = $availableCommands | Where-Object { $_.Name -like "$frameworkPrefix*" }
-
+    $snippets
     # Filter snippets based on search keywords
     if ($searchKeywords) {
         $snippets = $snippets | Where-Object {
@@ -141,7 +155,7 @@ function Show-PAFSnippetMenu {
     # Filter snippets based on the chosen category
     if ($category) {
         $snippets = $snippets | Where-Object {
-            $_.ScriptBlock.ToString() -match ".CATEGORY $category"
+            $_.ScriptBlock.ToString() -match ":CATEGORY $category"
         }
     }
 
@@ -149,7 +163,7 @@ function Show-PAFSnippetMenu {
     if (-not $category) {
         Write-Host "Available Categories:"
         $categories = $snippets | ForEach-Object {
-            $_.ScriptBlock.ToString() -replace "^.*\.CATEGORY", ""
+            $_.ScriptBlock.ToString() -replace "^.*\:CATEGORY", ""
         } | Sort-Object -Unique
         $index = 1
         foreach ($categoryName in $categories) {
@@ -177,7 +191,7 @@ function Show-PAFSnippetMenu {
         Show-SnippetMenu -category $selectedCategory
     }
     elseif ($selection -eq 'A') {
-        Show-SnippetMenu
+        Show-PAFSnippetMenu
     }
     elseif ($selection) {
         # User entered new search keywords, perform a new search
@@ -186,6 +200,58 @@ function Show-PAFSnippetMenu {
     else {
         Write-Host "Continuing without category selection or search."
     }
+}
+
+<#
+.SYNOPSIS
+    Get the category from a PowerShell script block.
+
+.DESCRIPTION
+    This function extracts the category information from a PowerShell script block that contains the ".CATEGORY" tag.
+
+.PARAMETER ScriptBlock
+    The PowerShell script block from which to extract the category.
+
+.EXAMPLE
+    Get-PAFScriptBlockCategory -ScriptBlock {
+        # Some script code here
+        .CATEGORY MyCategory
+        # More script code
+    }
+    # Output: "MyCategory"
+
+.EXAMPLE
+    > $functionScriptBlock = (Get-Command Get-Example).ScriptBlock
+    > $category = Get-PAFScriptBlockCategory -ScriptBlock $functionScriptBlock
+    > Write-Host "Category: $category"
+    # Output: "Category: Utility"
+#>
+function Get-PAFScriptBlockCategory {
+    [CmdletBinding()]
+    param (
+        [Parameter(Mandatory = $true, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true)]
+        [ScriptBlock]$ScriptBlock
+    )
+
+    try {
+        # Convert the script block to a string
+        $scriptText = $ScriptBlock.ToString()
+
+        # Define the regex pattern to match the .CATEGORY tag
+        $categoryRegex = '.*\:CATEGORY\s+(.+)'
+
+        # Attempt to find the .CATEGORY tag in the script text
+        $match = $scriptText | Select-String -Pattern $categoryRegex -AllMatches
+
+        if ($match.Matches.Count -gt 0) {
+            $category = $match.Matches[0].Groups[1].Value
+            return $category
+        }
+    } catch {
+        Write-Warning "An error occurred while extracting the category: $_"
+    }
+
+    return $null
 }
 
 # Export the functions to make them available to users of the module

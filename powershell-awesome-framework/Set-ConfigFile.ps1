@@ -14,7 +14,7 @@ $frameworkData = [PSCustomObject]@{
 $jsonData = $frameworkData | ConvertTo-Json -Depth 4
 
 # Specify the path where you want to save the JSON file
-$jsonFilePath = "${PSScriptRoot}\\config.json"
+$jsonFilePath = "${PSScriptRoot}\config.json"
 
 # Write the JSON data to the file
 $jsonData | Out-File -FilePath $jsonFilePath

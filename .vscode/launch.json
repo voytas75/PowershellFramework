@@ -8,7 +8,7 @@
             "name": "PowerShell: Module Interactive Session",
             "type": "PowerShell",
             "request": "launch",
-            "script": "Import-Module \"D:\\dane\\voytas\\Dokumenty\\visual_studio_code\\github\\PowershellFramework\\powershell-awesome-framework\\powershell-awesome-framework.psd1\" -force -verbose"
+            "script": "Import-Module \"D:\\dane\\voytas\\Dokumenty\\visual_studio_code\\github\\PowershellFramework\\powershell-awesome-framework\\powershell-awesome-framework.psd1\" -force;Get-PAFSnippets"
         }
     ]
 }

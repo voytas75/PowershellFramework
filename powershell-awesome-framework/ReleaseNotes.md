@@ -13,6 +13,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 ### Changed
 
 - storing `$PSScriptRoot` in config file.
+- function names.
 
 ## [0.0.1] - 2023.07.17
 
