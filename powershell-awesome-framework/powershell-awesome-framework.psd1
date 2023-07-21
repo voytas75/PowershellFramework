@@ -1,15 +1,20 @@
 @{
-    ModuleVersion     = '1.0'
-    GUID              = 'e91f3cc2-9f21-4373-a2e5-5e3c8357d55d'
-    Author            = 'Wojciech Napierała (voytas75)'
-    CompanyName       = 'Script Savvy Ninja'
-    Description       = 'Description of your module'
-    PowerShellVersion = '5.1'
-    FunctionsToExport = '*'
-    ModuleToProcess   = 'powershell-awesome-framework.psm1'
-
+    RootModule           = 'powershell-awesome-framework'
+    ModuleVersion        = '0.0.2'
+    GUID                 = 'e91f3cc2-9f21-4373-a2e5-b535b4a9eaea'
+    Author               = 'Wojciech Napierala (voytas75)'
+    Copyright            = '(c) 2023 Wojciech Napierala. All rights reserved.'
+    CompanyName          = 'Script Savvy Ninja'
+    Description          = 'Description of your module'
+    PowerShellVersion    = '5.1'
+    FunctionsToExport    = '*'
+    # Cmdlets to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no cmdlets to export.
+    CmdletsToExport      = @()
+    # Variables to export from this module
+    VariablesToExport    = '*'
+    ScriptsToProcess = "Set-ConfigFile.ps1"
     # Private data to pass to the module specified in RootModule/ModuleToProcess. This may also contain a PSData hashtable with additional module metadata used by PowerShell.
-    PrivateData       = @{
+    PrivateData          = @{
 
         PSData = @{
     
