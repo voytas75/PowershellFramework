@@ -1,0 +1,10 @@
+{
+    "FrameworkName": "PowerShell Awesome Framework",
+    "Version": "1.0",
+    "DefaultModulePath": "C:\\Path\\To\\Modules",
+    "UserSnippetsPath": "C:\\Path\\To\\User\\Snippets",
+    "UseColorOutput": true,
+    "MaxSnippetsPerPage": 10,
+    "ShowBannerOnStartup": true
+  }
+  
