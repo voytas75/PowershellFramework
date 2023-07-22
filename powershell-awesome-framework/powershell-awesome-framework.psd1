@@ -30,7 +30,7 @@
             ProjectUri = 'https://github.com/voytas75/PowershellFramework'
     
             # A URL to an icon representing this module.
-            # IconUri = ''
+            IconUri = 'https://raw.githubusercontent.com/voytas75/PowershellFramework/master/powershell-awesome-framework/images/PAF.PNG'
     
             # ReleaseNotes of this module
             # ReleaseNotes = 'ReleaseNotes.md'
