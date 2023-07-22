@@ -12,16 +12,7 @@ function Get-PAFConfiguration {
 
     if (-not (Test-Path $configFilePath)) {
         Write-Warning "Configuration file not found. Using default values."
-        return @{
-            "FrameworkName"       = "PowerShell Awesome Framework"
-            "DefaultModulePath"   = $PSScriptRoot
-            "SnippetsPath"        = "${PSScriptRoot}\snippets\core"
-            "UserSnippetsPath"    = "${PSScriptRoot}\snippets\user"
-            "UseColorOutput"      = true
-            "MaxSnippetsPerPage"  = 10
-            "ShowBannerOnStartup" = true
-            "FrameworkPrefix"     = "PAF_"
-        } # Add more keys and default values as needed
+        return Get-PAFDefaultConfiguration
     }
 
     try {
@@ -34,6 +25,18 @@ function Get-PAFConfiguration {
     }
 }
 
+function Get-PAFDefaultConfiguration {
+    return @{
+        "FrameworkName"       = "PowerShell Awesome Framework"
+        "DefaultModulePath"   = $PSScriptRoot
+        "SnippetsPath"        = "${PSScriptRoot}\snippets\core"
+        "UserSnippetsPath"    = "${PSScriptRoot}\snippets\user"
+        "UseColorOutput"      = $true
+        "MaxSnippetsPerPage"  = 10
+        "ShowBannerOnStartup" = $true
+        "FrameworkPrefix"     = "PAF_"
+    } # Add more keys and default values as needed
+}
 # Function to save updated configuration to JSON file
 function Save-PAFConfiguration {
     param (
