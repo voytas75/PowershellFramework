@@ -1,16 +1,17 @@
+function Get-ProcessInfo {
 <#
 .SYNOPSIS
 This snippet get processes info.
 
 .DESCRIPTION
-This script demonstrates how to retrieve basic system information using WMI and CIM cmdlets.
+This script demonstrates how to retrieve basic process information.
 #>
-function Get-ProcessInfo {
-    <#
+
+<#
 :CATEGORY
 System Information
 #>
-    [CmdletBinding()]
+[CmdletBinding()]
     param (
         [Parameter(Mandatory = $false, Position = 0)]
         [string]$ProcessName = "system"

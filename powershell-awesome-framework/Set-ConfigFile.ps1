@@ -2,7 +2,7 @@
 $frameworkData = [PSCustomObject]@{
     "FrameworkName"       = "PowerShell Awesome Framework"
     "DefaultModulePath"   = "${PSScriptRoot}"
-    "SnippetsPath"        = "${PSScriptRoot}\snippets\user"
+    "SnippetsPath"        = "${PSScriptRoot}\snippets\core"
     "UserSnippetsPath"    = "${PSScriptRoot}\Snippets\user"
     "UseColorOutput"      = $true
     "MaxSnippetsPerPage"  = 10

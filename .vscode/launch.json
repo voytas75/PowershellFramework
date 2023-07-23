@@ -5,10 +5,22 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "PowerShell: Module Interactive Session",
+            "name": "PowerShell: PAF - Get-PAFUserSnippets",
             "type": "PowerShell",
             "request": "launch",
-            "script": "Import-Module \"D:\\dane\\voytas\\Dokumenty\\visual_studio_code\\github\\PowershellFramework\\powershell-awesome-framework\\powershell-awesome-framework.psd1\" -force;Show-PAFSnippetMenu"
+            "script": "Import-Module \"D:\\dane\\voytas\\Dokumenty\\visual_studio_code\\github\\PowershellFramework\\powershell-awesome-framework\\powershell-awesome-framework.psd1\" -force -verbose;Get-PAFUserSnippets"
+        },
+        {
+            "name": "PowerShell: PAF - Show-PAFSnippetMenu",
+            "type": "PowerShell",
+            "request": "launch",
+            "script": "Import-Module \"D:\\dane\\voytas\\Dokumenty\\visual_studio_code\\github\\PowershellFramework\\powershell-awesome-framework\\powershell-awesome-framework.psd1\" -force -verbose;Show-PAFSnippetMenu"
+        },
+        {
+            "name": "PowerShell: PAF - Get-PAFSnippets",
+            "type": "PowerShell",
+            "request": "launch",
+            "script": "Import-Module \"D:\\dane\\voytas\\Dokumenty\\visual_studio_code\\github\\PowershellFramework\\powershell-awesome-framework\\powershell-awesome-framework.psd1\" -force -verbose;Get-PAFSnippets"
         }
     ]
 }
