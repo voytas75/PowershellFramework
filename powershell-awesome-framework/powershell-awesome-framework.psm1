@@ -1,6 +1,3 @@
-# Import required modules, if any
-# E.g., Import-Module SomeModule
-
 # Function to read JSON configuration file
 function Get-PAFConfiguration {
     param (
@@ -100,61 +97,6 @@ function Get-PAFSnippets {
         }
 
         return $snippetsMetadata
-    }
-}
-
-# Function to load user-specific snippets from the additional path
-function Get-PAFUserSnippets {
-    [CmdletBinding()]
-    param (
-        [Parameter(Mandatory = $false, Position = 0)]
-        [string]$UserSnippetsPath = ((Get-PAFConfiguration).UserSnippetsPath)
-    )
-    begin {
-        Write-Verbose "UserSnippetsPath: ${UserSnippetsPath}" -verbose
-        [PSObject]$ConfigData = (get-PAFConfiguration)
-    }
-    process {
-        # Ensure the user snippets path is valid
-        if (-not (Test-Path -Path $UserSnippetsPath -PathType Container)) {
-            Write-Error "User snippets path '$UserSnippetsPath' not found or invalid."
-            return
-        }
-
-        # Get all user snippet files in the user snippets directory
-        $userSnippetFiles = Get-ChildItem -Path $UserSnippetsPath -Filter "$($ConfigData.FrameworkPrefix)*.ps1" -File
-
-        # Initialize an array to store user snippet metadata
-        $userSnippetsMetadata = @()
-
-        # Loop through each user snippet file and extract metadata
-        foreach ($file in $userSnippetFiles) {
-            Try {
-                . $file.FullName
-            }
-            Catch {
-                Write-Error -Message "Failed to import file $($file.FullName): $_"
-            }
-
-            $functionName = $file.FullName -replace ($ConfigData.FrameworkPrefix, "")
-            $functionName = $functionName -replace (".ps1", "")
-            #$functionName
-            Write-Verbose ($file | Out-String) -Verbose
-
-            $functionScriptBlock = (Get-Command (split-path $functionName -Leaf)).ScriptBlock
-            $category = Get-PAFScriptBlockCategory -ScriptBlock $functionScriptBlock
-
-            #$metadata = Get-Help -Path $file.FullName -Category Function | Select-Object -Property Name, Synopsis, Description, Category
-
-            $metadata = Get-Help (split-path $functionName -Leaf) -Category Function | Select-Object -Property Name, Synopsis, @{l = "Description"; e = { $_.Description.text.ToString() } }, @{l = "Category"; e = { $category.ToString() } }
-
-            Write-Verbose "metadata '${file}': ${metadata}" -verbose
-
-
-            $userSnippetsMetadata += $metadata
-        }
-
-        return $userSnippetsMetadata
     }
 }
 
@@ -324,6 +266,8 @@ function Start-PAF {
 
     Show-PAFSnippetMenu -snippets $snippets
 }
+
+
 # Export the functions to make them available to users of the module
 #Export-ModuleMember -Function Read-Configuration, Save-Configuration, Get-Snippets, Get-UserSnippets, Show-SnippetMenu
 
