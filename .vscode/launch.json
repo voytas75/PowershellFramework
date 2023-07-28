@@ -5,6 +5,12 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "name": "PowerShell: PAF - Start-PAF",
+            "type": "PowerShell",
+            "request": "launch",
+            "script": "Import-Module \"D:\\dane\\voytas\\Dokumenty\\visual_studio_code\\github\\PowershellFramework\\powershell-awesome-framework\\powershell-awesome-framework.psd1\" -force -verbose;Start-PAF"
+        },
+        {
             "name": "PowerShell: PAF - Get-PAFUserSnippets",
             "type": "PowerShell",
             "request": "launch",

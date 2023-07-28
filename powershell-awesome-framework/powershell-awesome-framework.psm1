@@ -53,14 +53,12 @@ function Get-PAFSnippets {
     param (
         [Parameter(ValueFromPipeline = $true, Position = 0)]
         [ValidateNotNullOrEmpty()]
-        [PSObject]$ConfigData = (get-PAFConfiguration)
+        [string]$snippetsPath,
+        [string]$frameworkPrefix
     )
 
     process {
         # Get the snippets path from the configuration
-        $snippetsPath = $ConfigData.SnippetsPath
-
-        Write-Verbose ($ConfigData | Out-String)
         Write-Verbose ($snippetsPath | Out-String)
 
         # Ensure the snippets path is valid
@@ -70,7 +68,7 @@ function Get-PAFSnippets {
         }
 
         # Get all snippet files in the snippets directory
-        $snippetFiles = Get-ChildItem -Path $snippetsPath -Filter "$($ConfigData.FrameworkPrefix)*.ps1" -File
+        $snippetFiles = Get-ChildItem -Path $snippetsPath -Filter "${frameworkPrefix}*.ps1" -File
 
         # Initialize an array to store snippet metadata
         $snippetsMetadata = @()
@@ -85,7 +83,7 @@ function Get-PAFSnippets {
             }
             
 
-            $functionName = $file.FullName -replace ($ConfigData.FrameworkPrefix, "")
+            $functionName = $file.FullName -replace ($frameworkPrefix, "")
             $functionName = $functionName -replace (".ps1", "")
             #$functionName
             Write-Verbose ($file | Out-String) -Verbose
@@ -93,7 +91,11 @@ function Get-PAFSnippets {
             $functionScriptBlock = (Get-Command (split-path $functionName -Leaf)).ScriptBlock
             $category = Get-PAFScriptBlockCategory -ScriptBlock $functionScriptBlock
 
-            $metadata = Get-Help (split-path $functionName -Leaf) -Category Function | Select-Object -Property Name, Synopsis, @{l = "Description"; e = { $_.Description.text.ToString() } }, @{l = "Category"; e = { $category.ToString() } }
+            $metadata = Get-Help (split-path $functionName -Leaf) -Category Function | `
+                Select-Object -Property Name, `
+                Synopsis, `
+            @{l = "Description"; e = { $_.Description.text.ToString() } }, `
+            @{l = "Category"; e = { $category.ToString() } }
             $snippetsMetadata += $metadata
         }
 
@@ -160,39 +162,44 @@ function Get-PAFUserSnippets {
 function Show-PAFSnippetMenu {
     param (
         [string]$searchKeywords = $null,
-        [string]$category = $null
+        [string]$category = $null,
+        [string]$usersnippetsPath,
+        [string]$systemsnippetsPath,
+        [string]$frameworkPrefix,
+        [array]$snippets
     )
 
     # Define the naming convention for your snippets
     #$frameworkPrefix = $((Get-PAFConfiguration).FrameworkPrefix)
-
-$a = @()
-$a+=Get-PAFSnippets
-#$a | fl
-$a+=Get-PAFUserSnippets
-#$a | fl
-#Write-Verbose "metadata: $(${a})" -verbose
-#$a | gm
-#return
+    if (-not ($snippets.Count -gt 0)) {
+        $snippets = @()
+        $snippets += Get-PAFSnippets -snippetsPath $usersnippetsPath -frameworkPrefix $frameworkPrefix
+        #$a | fl
+        $snippets += Get-PAFSnippets -snippetsPath $systemsnippetsPath -frameworkPrefix $frameworkPrefix
+    }
+    #$a | fl
+    #Write-Verbose "metadata: $(${a})" -verbose
+    #$a | gm
+    #return
     # Retrieve available commands (functions) from loaded modules
     #$availableCommands = Get-Command | Where-Object { $_.CommandType -eq "Function" }
-    $availableCommands = $a.name
+    $availableCommands = $snippets.name
     #return $availableCommands
     # Filter commands to include only snippets specific to your framework based on naming convention
-   #$snippets = $availableCommands | Where-Object { $_.Name -like "$frameworkPrefix*" }
-   $snippets = $availableCommands
+    #$snippets = $availableCommands | Where-Object { $_.Name -like "$frameworkPrefix*" }
+    $_snippets = $availableCommands
     #return $snippets
     # Filter snippets based on search keywords
     if ($searchKeywords) {
-        $snippets = $a | Where-Object {
+        $_snippets = $snippets | Where-Object {
             $_.Name -match $searchKeywords -or $_.synopsis -match $searchKeywords -or $_.description -match $searchKeywords
         }
     }
 
     # Filter snippets based on the chosen category
     if ($category) {
-        $snippets = @()
-        $snippets += $a | Where-Object {
+        $_snippets = @()
+        $_snippets += $snippets | Where-Object {
             $_.category -match $category
         }
     }
@@ -204,7 +211,7 @@ $a+=Get-PAFUserSnippets
         #$categories = $snippets | ForEach-Object {
         #    $_.ScriptBlock.ToString() -replace "^.*\:CATEGORY", ""
         #} | Sort-Object -Unique
-        $categories += $a.category | Sort-Object -Unique
+        $categories += $snippets.category | Sort-Object -Unique
         $index = 1
         foreach ($categoryName in $categories) {
             Write-Host "$index. $categoryName"
@@ -215,14 +222,14 @@ $a+=Get-PAFUserSnippets
         # Remove the new line at the end using TrimEnd()
         #$category = $category.TrimEnd([Environment]::NewLine)# Remove the new line at the end using TrimEnd()
 
-        $text1 = "Snippets in '${category}' category:"
-        Write-Output $text1
+        $_text = "Snippets in '${category}' category:"
+        Write-Output $_text
         #$maxSnippetNameLength = ($snippets | ForEach-Object { $_.Name.Length }) | Measure-Object -Maximum | Select-Object -ExpandProperty Maximum
-        write-verbose (($snippets | gm) | out-string) -verbose
-        $snippetsCount = $snippets.Count
+        write-verbose (($_snippets | gm) | out-string) -verbose
+        $snippetsCount = $_snippets.Count
         write-verbose "snippetsCount: ${snippetsCount}" -verbose
-        for ($i = 0; $i -lt $snippets.Count; $i++) {
-            $snippet = $snippets[$i]
+        for ($i = 0; $i -lt $_snippets.Count; $i++) {
+            $snippet = $_snippets[$i]
             #$snippetName = $snippet.Name -replace "^$frameworkPrefix", ""
             $snippetName = $snippet.Name
             #$snippetName = $snippetName.PadRight($maxSnippetNameLength)
@@ -236,14 +243,14 @@ $a+=Get-PAFUserSnippets
 
     if ($selection -ge 1 -and $selection -le $categories.Count) {
         $selectedCategory = $categories[$selection - 1]
-        Show-PAFSnippetMenu -category $selectedCategory
+        Show-PAFSnippetMenu -category $selectedCategory -snippets $snippets
     }
     elseif ($selection -eq 'A') {
-        Show-PAFSnippetMenu
+        Show-PAFSnippetMenu -snippets $snippets
     }
     elseif ($selection) {
         # User entered new search keywords, perform a new search
-        Show-PAFSnippetMenu -searchKeywords $selection
+        Show-PAFSnippetMenu -searchKeywords $selection -snippets $snippets
     }
     else {
         Write-Host "Continuing without category selection or search."
@@ -304,6 +311,19 @@ function Get-PAFScriptBlockCategory {
     return $null
 }
 
+function Start-PAF {
+    param ()
+    $configData = Get-PAFConfiguration
+    $usersnippetsPath = $configData.userSnippetsPath
+    $systemsnippetsPath = $configData.SnippetsPath
+    $frameworkPrefix = $configData.frameworkPrefix
+    $snippets = @()
+    $snippets += (Get-PAFSnippets -snippetsPath $usersnippetsPath -frameworkPrefix $frameworkPrefix)
+    $snippets += (Get-PAFSnippets -snippetsPath $systemsnippetsPath -frameworkPrefix $frameworkPrefix)
+    #$snippets
+
+    Show-PAFSnippetMenu -snippets $snippets
+}
 # Export the functions to make them available to users of the module
 #Export-ModuleMember -Function Read-Configuration, Save-Configuration, Get-Snippets, Get-UserSnippets, Show-SnippetMenu
 
