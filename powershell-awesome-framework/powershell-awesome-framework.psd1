@@ -1,6 +1,6 @@
 @{
     RootModule        = 'powershell-awesome-framework'
-    ModuleVersion     = '0.0.2'
+    ModuleVersion     = '0.0.4'
     GUID              = 'e91f3cc2-9f21-4373-a2e5-b535b4a9eaea'
     Author            = 'Wojciech Napierala (voytas75)'
     Copyright         = '(c) 2023 Wojciech Napierala. All rights reserved.'
@@ -12,7 +12,7 @@
     CmdletsToExport   = @()
     # Variables to export from this module
     VariablesToExport = '*'
-    ScriptsToProcess  = "Set-ConfigFile.ps1"
+    ScriptsToProcess  = "Set-PAFConfigFile.ps1"
     # Private data to pass to the module specified in RootModule/ModuleToProcess. This may also contain a PSData hashtable with additional module metadata used by PowerShell.
     PrivateData       = @{
 

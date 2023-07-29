@@ -20,4 +20,4 @@ $jsonFilePath = "${PSScriptRoot}\config.json"
 $jsonData | Out-File -FilePath $jsonFilePath
 
 # Output a message indicating successful creation
-Write-Host "JSON file created successfully at: $jsonFilePath"
+Write-Verbose "JSON file created successfully at: $jsonFilePath" -Verbose
