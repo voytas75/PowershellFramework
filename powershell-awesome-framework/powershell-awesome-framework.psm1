@@ -199,6 +199,95 @@ function Show-PAFSnippetMenu {
     }
 }
 
+function Show-PAFSnippetMenu2 {
+    param (
+        [string]$searchKeywords = $null,
+        [string]$category = $null,
+        [string]$usersnippetsPath = $null,
+        [string]$systemsnippetsPath = $null,
+        [string]$frameworkPrefix,
+        [array]$snippets = $null
+    )
+
+    try {
+        # Caching snippets to avoid repeated file I/O
+        if (-not $script:cachedSnippets) {
+            $script:cachedSnippets = @()
+            $script:cachedSnippets += Get-PAFSnippets -snippetsPath $usersnippetsPath -frameworkPrefix $frameworkPrefix
+            $script:cachedSnippets += Get-PAFSnippets -snippetsPath $systemsnippetsPath -frameworkPrefix $frameworkPrefix
+        }
+
+        $allSnippets = $script:cachedSnippets
+
+        # Filter snippets based on search keywords
+        if ($searchKeywords) {
+            $allSnippets = $allSnippets | Where-Object {
+                $_.Name -like "*$searchKeywords*" -or $_.synopsis -like "*$searchKeywords*" -or $_.description -like "*$searchKeywords*"
+            }
+        }
+
+        # Filter snippets based on the chosen category
+        if ($category) {
+            $allSnippets = $allSnippets | Where-Object {
+                $_.category -eq $category
+            }
+        }
+
+        # Display categories if no category specified, or display snippets for the chosen category
+        if (-not $category) {
+            $categories = $allSnippets | Select-Object -ExpandProperty Category -Unique
+            Write-Host "Available Categories:"
+            $categories | ForEach-Object { Write-Host $_ }
+        }
+        else {
+            $categorySnippets = @{}
+            $allSnippets | ForEach-Object {
+                $categorySnippets[$_.Category] += $_
+            }
+
+            Write-Output "Snippets in '$category' category:"
+            $categorySnippets[$category] | ForEach-Object {
+                Write-Host "$($_.Name). '$($_.Name)' $($_.Synopsis)"
+            }
+        }
+
+        # Prompt user for category selection, snippet selection, or new search keywords
+        $selection = Read-Host "Enter the number of the category you want to browse, enter 'A' for all snippets, or enter new search keywords (press Enter to continue without search)"
+
+        switch ($selection) {
+            { $_ -ge 1 -and $_ -le $categories.Count } {
+                $selectedCategory = $categories[$selection - 1]
+                Show-PAFSnippetMenu2 -category $selectedCategory -snippets $allSnippets -usersnippetsPath $usersnippetsPath -systemsnippetsPath $systemsnippetsPath -frameworkPrefix $frameworkPrefix
+            }
+            { $_ -eq 'A' } {
+                Show-PAFSnippetMenu2 -snippets $allSnippets -usersnippetsPath $usersnippetsPath -systemsnippetsPath $systemsnippetsPath -frameworkPrefix $frameworkPrefix
+            }
+            { $_ } {
+                Show-PAFSnippetMenu2 -searchKeywords $selection -snippets $allSnippets -usersnippetsPath $usersnippetsPath -systemsnippetsPath $systemsnippetsPath -frameworkPrefix $frameworkPrefix
+            }
+            default {
+                Write-Host "Continuing without category selection or search."
+            }
+        }
+
+        # Prompt user to choose a snippet to execute
+        $executeSnippet = Read-Host "Enter the number of the snippet you want to execute (press Enter to continue without execution)"
+
+        if ($executeSnippet -ge 1 -and $executeSnippet -le $allSnippets.Count) {
+            $selectedSnippet = $allSnippets[$executeSnippet - 1]
+            Write-Host "Executing snippet function: $($selectedSnippet.Name)..."
+            Invoke-Expression "& { . $($selectedSnippet.Name) }"
+        }
+        else {
+            Write-Host "Continuing without snippet execution."
+        }
+    }
+    catch {
+        Write-Error "Error in Show-PAFSnippetMenu: $_"
+    }
+}
+
+
 <#
 .SYNOPSIS
     Get the category from a PowerShell script block.
@@ -253,18 +342,23 @@ function Get-PAFScriptBlockCategory {
     return $null
 }
 
-function Start-PAF {
-    param ()
-    $configData = Get-PAFConfiguration
-    $usersnippetsPath = $configData.userSnippetsPath
-    $systemsnippetsPath = $configData.SnippetsPath
-    $frameworkPrefix = $configData.frameworkPrefix
-    $snippets = @()
-    $snippets += (Get-PAFSnippets -snippetsPath $usersnippetsPath -frameworkPrefix $frameworkPrefix)
-    $snippets += (Get-PAFSnippets -snippetsPath $systemsnippetsPath -frameworkPrefix $frameworkPrefix)
-    #$snippets
 
-    Show-PAFSnippetMenu -snippets $snippets
+function Start-PAF {
+    try {
+        $configData = Get-PAFConfiguration
+        $usersnippetsPath = $configData.UserSnippetsPath
+        $systemsnippetsPath = $configData.SnippetsPath
+        $frameworkPrefix = $configData.FrameworkPrefix
+
+        $snippets = @()
+        $snippets += (Get-PAFSnippets -snippetsPath $usersnippetsPath -frameworkPrefix $frameworkPrefix)
+        $snippets += (Get-PAFSnippets -snippetsPath $systemsnippetsPath -frameworkPrefix $frameworkPrefix)
+
+        Show-PAFSnippetMenu2 -snippets $snippets -usersnippetsPath $usersnippetsPath -systemsnippetsPath $systemsnippetsPath -frameworkPrefix $frameworkPrefix
+    }
+    catch {
+        Write-Error "Error in Start-PAF: $_"
+    }
 }
 
 
