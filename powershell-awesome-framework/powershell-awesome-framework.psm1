@@ -1,33 +1,59 @@
 # Function to read JSON configuration file
 function Get-PAFConfiguration {
+    <#
+    .SYNOPSIS
+    Reads the JSON configuration file and returns the configuration data.
+
+    .DESCRIPTION
+    This function reads the JSON configuration file specified by the ConfigFilePath parameter and converts it to a PowerShell object.
+    It validates the structure of the configuration file and returns the configuration data.
+
+    .PARAMETER ConfigFilePath
+    The path to the JSON configuration file. If not specified, the default path is used.
+
+    .EXAMPLE
+    Get-PAFConfiguration -ConfigFilePath "C:\Path\to\config.json"
+    Reads the configuration from the specified file.
+
+    .EXAMPLE
+    Get-PAFConfiguration
+    Reads the configuration from the default file path.
+
+    #>
     param (
         [Parameter(Position = 0)]
-        [string]$configFilePath = (Join-Path $PSScriptRoot 'config.json')
+        [string]$ConfigFilePath = (Join-Path $PSScriptRoot 'config.json')
     )
 
     # Check if the configuration file exists
-    if (-not (Test-Path $configFilePath)) {
-        Write-Warning "Configuration file not found at '$configFilePath'. Using default values."
+    if (-not (Test-Path $ConfigFilePath)) {
+        Write-Warning "Configuration file not found at '$ConfigFilePath'. Using default values."
         return Get-PAFDefaultConfiguration
     }
 
     try {
         # Read the content of the configuration file and convert it to a JSON object
-        $configData = Get-Content -Path $configFilePath -Raw | ConvertFrom-Json
+        $ConfigData = Get-Content -Path $ConfigFilePath -Raw | ConvertFrom-Json
 
         # Validate the configuration file structure
-        if (-not $configData.PSObject.Properties.Name -contains "FrameworkName" -or
-            -not $configData.PSObject.Properties.Name -contains "DefaultModulePath" -or
-            -not $configData.PSObject.Properties.Name -contains "SnippetsPath" -or
-            -not $configData.PSObject.Properties.Name -contains "UserSnippetsPath" -or
-            -not $configData.PSObject.Properties.Name -contains "MaxSnippetsPerPage" -or
-            -not $configData.PSObject.Properties.Name -contains "ShowBannerOnStartup" -or
-            -not $configData.PSObject.Properties.Name -contains "FrameworkPrefix") {
-            Write-Warning "Invalid configuration file structure. Using default values."
+        $RequiredProperties = @(
+            "FrameworkName",
+            "DefaultModulePath",
+            "SnippetsPath",
+            "UserSnippetsPath",
+            "MaxSnippetsPerPage",
+            "ShowBannerOnStartup",
+            "FrameworkPrefix"
+        )
+
+        $MissingProperties = $RequiredProperties | Where-Object { $ConfigData.PSObject.Properties.Name -notcontains $_ }
+
+        if ($MissingProperties) {
+            Write-Warning "Invalid configuration file structure. Missing properties: $MissingProperties. Using default values."
             return Get-PAFDefaultConfiguration
         }
 
-        return $configData
+        return $ConfigData
     }
     catch {
         Write-Error "Error reading or parsing the configuration file: $_"
@@ -83,7 +109,7 @@ function Get-PAFSnippets {
         [string]$frameworkPrefix
     )
 
-    process {
+    try {
         # Get the snippets path from the configuration
         Write-Verbose ($snippetsPath | Out-String)
 
@@ -98,53 +124,46 @@ function Get-PAFSnippets {
 
         # Initialize an array to store snippet metadata
         $snippetsMetadata = @()
-        Write-Verbose ($snippetsMetadata | Out-String)
+
         # Loop through each snippet file and extract metadata
         foreach ($file in $snippetFiles) {
             Try {
-                #. $file.FullName
+                $functionScriptBlock = Get-Content -Path $file.FullName -Raw
+                # Extract information from the script block using a custom function
+                $functionName = Get-PAFScriptBlockInfo -ScriptBlock $functionScriptBlock -InfoType FunctionName
+                $category = Get-PAFScriptBlockInfo -ScriptBlock $functionScriptBlock -InfoType Category
+                if ($null -eq $category) {
+                    $category = "No category"
+                }
+
+                $metadata = Get-Help -Name $file.FullName -Full | `
+                    Select-Object -Property Synopsis, `
+                @{l = "Description"; e = { $_.Description.Text } }, `
+                @{l = "Category"; e = { $category } }
+
+                $snippetMetadata = [PSCustomObject]@{
+                    'name'        = $functionName
+                    'synopsis'    = $metadata.Synopsis
+                    'description' = $metadata.Description.ToString()
+                    'category'    = $metadata.Category.ToString()
+                    'path'        = $file.FullName
+                }
+
+                $snippetsMetadata += $snippetMetadata
             }
             Catch {
                 Write-Error -Message "Failed to import file $($file.FullName): $_"
             }
-            
-
-            $functionName = $file.FullName -replace ($frameworkPrefix, "")
-            $functionName = $functionName -replace (".ps1", "")
-            #$functionName
-            Write-Verbose ($file | Out-String)
-
-            #$functionScriptBlock = (Get-Command (split-path $functionName -Leaf)).ScriptBlock
-            $functionScriptBlock = Get-Content -Path $file.FullName -Raw
-            #$functionScriptBlock = 
-            #$category = Get-PAFScriptBlockCategory -ScriptBlock $functionScriptBlock
-            $category = Get-PAFScriptBlockInfo -ScriptBlock $functionScriptBlock -InfoType Category
-            if ($null -eq $category) {
-                $category = "No category"            }
-
-            #$functionName = Get-PAFScriptBlockName -ScriptBlock $functionScriptBlock
-            $functionName = Get-PAFScriptBlockInfo -ScriptBlock $functionScriptBlock -InfoType FunctionName
-            if ($null -eq $functionName) {
-                $functionName = $file.FullName            }
-            $metadata = Get-Help -Name $file.FullName -full | `
-                Select-Object -Property Synopsis, `
-            @{l = "Description"; e = { $_.Description.Text } }, `
-            @{l = "Category"; e = { $category } }
-
-            $snippetMetadata = [PSCustomObject]@{
-                'name'        = $functionName
-                'synopsis'    = $metadata.Synopsis
-                'description' = $metadata.Description.ToString()
-                'category'    = $metadata.Category.ToString()
-                'path'        = $file.FullName
-            }
-
-            $snippetsMetadata += $snippetMetadata
         }
 
         return $snippetsMetadata
     }
+    catch {
+        Write-Error "An error occurred while retrieving snippets: $_"
+        return $null
+    }
 }
+
 
 # Main menu function with snippet categories
 
@@ -292,86 +311,33 @@ function Get-PAFScriptBlockInfo {
     return $null
 }
 
-
-function Get-PAFScriptBlockInfo2 {
-    [CmdletBinding()]
-    param (
-        [Parameter(Mandatory = $true, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true)]
-        [string]$ScriptBlock,
-
-        [Parameter(Mandatory = $true)]
-        [ValidateSet("FunctionName", "Category")]
-        [string]$InfoType
-    )
-
-    try {
-        # Convert the script block to a string
-        $scriptText = $ScriptBlock.ToString()
-
-        # Define the regex patterns to match the :NAME and :CATEGORY tags
-        $nameRegex = '.*\:NAME\s+(.+)'
-        $categoryRegex = '.*\:CATEGORY\s+(.+)'
-
-        # Initialize variables to hold extracted values
-        $functionName = $null
-        $category = $null
-
-        # Attempt to find the :NAME and :CATEGORY tags in the script text
-        $nameMatch = $scriptText | Select-String -Pattern $nameRegex -AllMatches
-        $categoryMatch = $scriptText | Select-String -Pattern $categoryRegex -AllMatches
-
-        # Extract the main function name value
-        if ($nameMatch.Matches.Count -gt 0) {
-            $functionName = $nameMatch.Matches[0].Groups[1].Value.TrimEnd([Environment]::NewLine)
-        }
-
-        # Extract the category value
-        if ($categoryMatch.Matches.Count -gt 0) {
-            $category = $categoryMatch.Matches[0].Groups[1].Value.TrimEnd([Environment]::NewLine)
-        }
-
-        # Determine the requested information based on $InfoType
-        switch ($InfoType) {
-            "FunctionName" {
-                return $functionName
-            }
-            "Category" {
-                return $category
-            }
-            default {
-                Write-Warning "Invalid value for InfoType. Use 'FunctionName' or 'Category'."
-                return $null
-            }
-        }
-    }
-    catch {
-        Write-Warning "An error occurred while extracting the script block information: $_"
-    }
-
-    return $null
-}
-
-
 function Start-PAF {
     try {
         $configData = Get-PAFConfiguration
+        if ($null -eq $configData) {
+            Write-Error "Failed to load configuration. Exiting PAF."
+            return
+        }
+
         $usersnippetsPath = $configData.UserSnippetsPath
         $systemsnippetsPath = $configData.SnippetsPath
         $frameworkPrefix = $configData.FrameworkPrefix
 
-        if($configData.ShowBannerOnStartup -and $null -eq $bannerShowed ) {
+        if ($configData.ShowBannerOnStartup -and $null -eq $bannerShowed ) {
             get-banner
             $bannerShowed = $true
         }
 
-        # Caching snippets to avoid repeated file I/O
-        $script:cachedSnippets = @()
-        $script:cachedSnippets += (Get-PAFSnippets -snippetsPath $usersnippetsPath -frameworkPrefix $frameworkPrefix)
+        while ($true) {
+            
+            # Caching snippets to avoid repeated file I/O
+            $script:cachedSnippets = @()
+            $script:cachedSnippets += (Get-PAFSnippets -snippetsPath $usersnippetsPath -frameworkPrefix $frameworkPrefix)
 
-        $script:cachedSnippets += (Get-PAFSnippets -snippetsPath $systemsnippetsPath -frameworkPrefix $frameworkPrefix)
+            $script:cachedSnippets += (Get-PAFSnippets -snippetsPath $systemsnippetsPath -frameworkPrefix $frameworkPrefix)
 
-        Show-PAFSnippetMenu -usersnippetsPath $usersnippetsPath -systemsnippetsPath $systemsnippetsPath -frameworkPrefix $frameworkPrefix
-        Start-PAF
+            Show-PAFSnippetMenu -usersnippetsPath $usersnippetsPath -systemsnippetsPath $systemsnippetsPath -frameworkPrefix $frameworkPrefix
+        }
     }
     catch {
         Write-Error "Error in Start-PAF: $_"
