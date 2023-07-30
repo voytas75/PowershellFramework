@@ -73,7 +73,7 @@ function Get-PAFSnippets {
         # Loop through each snippet file and extract metadata
         foreach ($file in $snippetFiles) {
             Try {
-                . $file.FullName
+                #. $file.FullName
             }
             Catch {
                 Write-Error -Message "Failed to import file $($file.FullName): $_"
@@ -85,15 +85,25 @@ function Get-PAFSnippets {
             #$functionName
             Write-Verbose ($file | Out-String) -Verbose
 
-            $functionScriptBlock = (Get-Command (split-path $functionName -Leaf)).ScriptBlock
+            #$functionScriptBlock = (Get-Command (split-path $functionName -Leaf)).ScriptBlock
+            $functionScriptBlock = Get-Content -Path $file.FullName -Raw
             $category = Get-PAFScriptBlockCategory -ScriptBlock $functionScriptBlock
+            $functionName = Get-PAFScriptBlockName -ScriptBlock $functionScriptBlock
 
-            $metadata = Get-Help (split-path $functionName -Leaf) -Category Function | `
-                Select-Object -Property Name, `
-                Synopsis, `
-            @{l = "Description"; e = { $_.Description.text.ToString() } }, `
-            @{l = "Category"; e = { $category.ToString() } }
-            $snippetsMetadata += $metadata
+            $metadata = Get-Help -Name $file.FullName -full | `
+                Select-Object -Property Synopsis, `
+            @{l = "Description"; e = { $_.Description.Text } }, `
+            @{l = "Category"; e = { $category } }
+
+            $snippetMetadata = [PSCustomObject]@{
+                'name'        = $functionName
+                'synopsis'    = $metadata.Synopsis
+                'description' = $metadata.Description.ToString()
+                'category'    = $metadata.Category.ToString()
+                'path'        = $file.FullName
+            }
+
+            $snippetsMetadata += $snippetMetadata
         }
 
         return $snippetsMetadata
@@ -105,108 +115,9 @@ function Show-PAFSnippetMenu {
     param (
         [string]$searchKeywords = $null,
         [string]$category = $null,
-        [string]$usersnippetsPath,
-        [string]$systemsnippetsPath,
-        [string]$frameworkPrefix,
-        [array]$snippets
-    )
-
-    # Define the naming convention for your snippets
-    #$frameworkPrefix = $((Get-PAFConfiguration).FrameworkPrefix)
-    if (-not ($snippets.Count -gt 0)) {
-        $snippets = @()
-        $snippets += Get-PAFSnippets -snippetsPath $usersnippetsPath -frameworkPrefix $frameworkPrefix
-        #$a | fl
-        $snippets += Get-PAFSnippets -snippetsPath $systemsnippetsPath -frameworkPrefix $frameworkPrefix
-    }
-    #$a | fl
-    #Write-Verbose "metadata: $(${a})" -verbose
-    #$a | gm
-    #return
-    # Retrieve available commands (functions) from loaded modules
-    #$availableCommands = Get-Command | Where-Object { $_.CommandType -eq "Function" }
-    $availableCommands = $snippets.name
-    #return $availableCommands
-    # Filter commands to include only snippets specific to your framework based on naming convention
-    #$snippets = $availableCommands | Where-Object { $_.Name -like "$frameworkPrefix*" }
-    $_snippets = $availableCommands
-    #return $snippets
-    # Filter snippets based on search keywords
-    if ($searchKeywords) {
-        $_snippets = $snippets | Where-Object {
-            $_.Name -match $searchKeywords -or $_.synopsis -match $searchKeywords -or $_.description -match $searchKeywords
-        }
-    }
-
-    # Filter snippets based on the chosen category
-    if ($category) {
-        $_snippets = @()
-        $_snippets += $snippets | Where-Object {
-            $_.category -match $category
-        }
-    }
-
-    # Display categories if no category specified, or display snippets for the chosen category
-    if (-not $category) {
-        $categories = @()
-        Write-Host "Available Categories:"
-        #$categories = $snippets | ForEach-Object {
-        #    $_.ScriptBlock.ToString() -replace "^.*\:CATEGORY", ""
-        #} | Sort-Object -Unique
-        $categories += $snippets.category | Sort-Object -Unique
-        $index = 1
-        foreach ($categoryName in $categories) {
-            Write-Host "$index. $categoryName"
-            $index++
-        }
-    }
-    else {
-        # Remove the new line at the end using TrimEnd()
-        #$category = $category.TrimEnd([Environment]::NewLine)# Remove the new line at the end using TrimEnd()
-
-        $_text = "Snippets in '${category}' category:"
-        Write-Output $_text
-        #$maxSnippetNameLength = ($snippets | ForEach-Object { $_.Name.Length }) | Measure-Object -Maximum | Select-Object -ExpandProperty Maximum
-        write-verbose (($_snippets | gm) | out-string) -verbose
-        $snippetsCount = $_snippets.Count
-        write-verbose "snippetsCount: ${snippetsCount}" -verbose
-        for ($i = 0; $i -lt $_snippets.Count; $i++) {
-            $snippet = $_snippets[$i]
-            #$snippetName = $snippet.Name -replace "^$frameworkPrefix", ""
-            $snippetName = $snippet.Name
-            #$snippetName = $snippetName.PadRight($maxSnippetNameLength)
-            $synopsis = $($snippet.synopsis)
-            Write-Host "$($i + 1). '${snippetName}' ${synopsis}"
-        }
-    }
-
-    # Prompt user for category selection, snippet selection, or new search keywords
-    $selection = Read-Host "Enter the number of the category you want to browse, enter 'A' for all snippets, or enter new search keywords (press Enter to continue without search)"
-
-    if ($selection -ge 1 -and $selection -le $categories.Count) {
-        $selectedCategory = $categories[$selection - 1]
-        Show-PAFSnippetMenu -category $selectedCategory -snippets $snippets
-    }
-    elseif ($selection -eq 'A') {
-        Show-PAFSnippetMenu -snippets $snippets
-    }
-    elseif ($selection) {
-        # User entered new search keywords, perform a new search
-        Show-PAFSnippetMenu -searchKeywords $selection -snippets $snippets
-    }
-    else {
-        Write-Host "Continuing without category selection or search."
-    }
-}
-
-function Show-PAFSnippetMenu2 {
-    param (
-        [string]$searchKeywords = $null,
-        [string]$category = $null,
         [string]$usersnippetsPath = $null,
         [string]$systemsnippetsPath = $null,
-        [string]$frameworkPrefix,
-        [array]$snippets = $null
+        [string]$frameworkPrefix
     )
 
     try {
@@ -226,60 +137,54 @@ function Show-PAFSnippetMenu2 {
             }
         }
 
-        # Filter snippets based on the chosen category
-        if ($category) {
-            $allSnippets = $allSnippets | Where-Object {
-                $_.category -eq $category
-            }
-        }
-
         # Display categories if no category specified, or display snippets for the chosen category
         if (-not $category) {
             $categories = $allSnippets | Select-Object -ExpandProperty Category -Unique
             Write-Host "Available Categories:"
-            $categories | ForEach-Object { Write-Host $_ }
+            $categoriesWithNumbers = $categories | ForEach-Object -Begin { $count = 1 } -Process {
+                Write-Host "$count. $_"
+                $count++
+            }
+
+            # Prompt user for category selection
+            $selection = Read-Host "Enter the number of the category you want to browse (press Enter to continue without search)"
+
+            if ($selection -ge 1 -and $selection -le $categories.Count) {
+                $category = $categories[$selection - 1]
+            }
         }
-        else {
-            $categorySnippets = @{}
-            $allSnippets | ForEach-Object {
-                $categorySnippets[$_.Category] += $_
+
+        # Filter snippets based on the chosen category
+        if ($category) {
+            $categorySnippets = @()
+            $categorySnippets += $allSnippets | Where-Object {
+                $_.Category -eq $category
             }
 
             Write-Output "Snippets in '$category' category:"
-            $categorySnippets[$category] | ForEach-Object {
+            $SnippetsWithNumbers = $categorySnippets | ForEach-Object -Begin { $count = 1 } -Process {
+                Write-Host "$count. $($_.name)"
+                $count++
+            }
+
+<#             $categorySnippets | ForEach-Object {
                 Write-Host "$($_.Name). '$($_.Name)' $($_.Synopsis)"
             }
-        }
-
-        # Prompt user for category selection, snippet selection, or new search keywords
-        $selection = Read-Host "Enter the number of the category you want to browse, enter 'A' for all snippets, or enter new search keywords (press Enter to continue without search)"
-
-        switch ($selection) {
-            { $_ -ge 1 -and $_ -le $categories.Count } {
-                $selectedCategory = $categories[$selection - 1]
-                Show-PAFSnippetMenu2 -category $selectedCategory -snippets $allSnippets -usersnippetsPath $usersnippetsPath -systemsnippetsPath $systemsnippetsPath -frameworkPrefix $frameworkPrefix
+ #>
+            # Prompt user to choose a snippet to execute
+            $executeSnippet = Read-Host "Enter the number of the snippet you want to execute (press Enter to continue without execution)"
+            $categorySnippets.Count
+            if ($executeSnippet -ge 1 -and $executeSnippet -le $categorySnippets.Count) {
+                $selectedSnippet = $categorySnippets[$executeSnippet - 1]
+                Write-Host "Executing snippet function: $($selectedSnippet.Name) ($($selectedSnippet.Path))..."
+                Invoke-Expression "& { . $($selectedSnippet.Path) }"
             }
-            { $_ -eq 'A' } {
-                Show-PAFSnippetMenu2 -snippets $allSnippets -usersnippetsPath $usersnippetsPath -systemsnippetsPath $systemsnippetsPath -frameworkPrefix $frameworkPrefix
+            else {
+                Write-Host "Continuing without snippet execution."
             }
-            { $_ } {
-                Show-PAFSnippetMenu2 -searchKeywords $selection -snippets $allSnippets -usersnippetsPath $usersnippetsPath -systemsnippetsPath $systemsnippetsPath -frameworkPrefix $frameworkPrefix
-            }
-            default {
-                Write-Host "Continuing without category selection or search."
-            }
-        }
-
-        # Prompt user to choose a snippet to execute
-        $executeSnippet = Read-Host "Enter the number of the snippet you want to execute (press Enter to continue without execution)"
-
-        if ($executeSnippet -ge 1 -and $executeSnippet -le $allSnippets.Count) {
-            $selectedSnippet = $allSnippets[$executeSnippet - 1]
-            Write-Host "Executing snippet function: $($selectedSnippet.Name)..."
-            Invoke-Expression "& { . $($selectedSnippet.Name) }"
         }
         else {
-            Write-Host "Continuing without snippet execution."
+            Write-Host "Continuing without category selection."
         }
     }
     catch {
@@ -287,13 +192,14 @@ function Show-PAFSnippetMenu2 {
     }
 }
 
-
+# Gets name of category from snippet; must be definied by user in script
+function Get-PAFScriptBlockCategory {
 <#
 .SYNOPSIS
     Get the category from a PowerShell script block.
 
 .DESCRIPTION
-    This function extracts the category information from a PowerShell script block that contains the ".CATEGORY" tag.
+    This function extracts the category information from a PowerShell script block that contains the ":CATEGORY" tag.
 
 .PARAMETER ScriptBlock
     The PowerShell script block from which to extract the category.
@@ -301,7 +207,8 @@ function Show-PAFSnippetMenu2 {
 .EXAMPLE
     Get-PAFScriptBlockCategory -ScriptBlock {
         # Some script code here
-        .CATEGORY MyCategory
+        :CATEGORY
+        MyCategory
         # More script code
     }
     # Output: "MyCategory"
@@ -310,23 +217,24 @@ function Show-PAFSnippetMenu2 {
     > $functionScriptBlock = (Get-Command Get-Example).ScriptBlock
     > $category = Get-PAFScriptBlockCategory -ScriptBlock $functionScriptBlock
     > Write-Host "Category: $category"
-    # Output: "Category: Utility"
+    # Output: "Category: Example"
 #>
-function Get-PAFScriptBlockCategory {
-    [CmdletBinding()]
+
+
+[CmdletBinding()]
     param (
         [Parameter(Mandatory = $true, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true)]
-        [ScriptBlock]$ScriptBlock
+        $ScriptBlock
     )
 
     try {
         # Convert the script block to a string
         $scriptText = $ScriptBlock.ToString()
 
-        # Define the regex pattern to match the .CATEGORY tag
+        # Define the regex pattern to match the :CATEGORY tag
         $categoryRegex = '.*\:CATEGORY\s+(.+)'
 
-        # Attempt to find the .CATEGORY tag in the script text
+        # Attempt to find the :CATEGORY tag in the script text
         $match = $scriptText | Select-String -Pattern $categoryRegex -AllMatches
 
         if ($match.Matches.Count -gt 0) {
@@ -342,6 +250,64 @@ function Get-PAFScriptBlockCategory {
     return $null
 }
 
+# Gets name of main function in snippet; must be definied by user in script   
+function Get-PAFScriptBlockName {
+<#
+.SYNOPSIS
+    Get the main function name from a PowerShell script block.
+
+.DESCRIPTION
+    This function extracts the main function name information from a PowerShell script block that contains the ":NAME" tag.
+
+.PARAMETER ScriptBlock
+    The PowerShell script block from which to extract the main function name.
+
+.EXAMPLE
+    Get-PAFScriptBlockName -ScriptBlock {
+        # Some script code here
+        :Name 
+        MyName
+        # More script code
+    }
+    # Output: "MyName"
+
+.EXAMPLE
+    > $functionScriptBlock = (Get-Command Get-Example).ScriptBlock
+    > $name = Get-PAFScriptBlockName -ScriptBlock $functionScriptBlock
+    > Write-Host "Name: $name"
+    # Output: "Name: Get-Example"
+#>
+
+
+    [CmdletBinding()]
+    param (
+        [Parameter(Mandatory = $true, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true)]
+        $ScriptBlock
+    )
+
+    try {
+        # Convert the script block to a string
+        $scriptText = $ScriptBlock.ToString()
+
+        # Define the regex pattern to match the :NAME tag
+        $nameRegex = '.*\:NAME\s+(.+)'
+
+        # Attempt to find the :NAME tag in the script text
+        $match = $scriptText | Select-String -Pattern $nameRegex -AllMatches
+
+        if ($match.Matches.Count -gt 0) {
+            $name = $match.Matches[0].Groups[1].Value
+            $name = $name.TrimEnd([Environment]::NewLine)
+            return $name
+        }
+    }
+    catch {
+        Write-Warning "An error occurred while extracting the name: $_"
+    }
+
+    return $null
+}
+
 
 function Start-PAF {
     try {
@@ -350,11 +316,13 @@ function Start-PAF {
         $systemsnippetsPath = $configData.SnippetsPath
         $frameworkPrefix = $configData.FrameworkPrefix
 
-        $snippets = @()
-        $snippets += (Get-PAFSnippets -snippetsPath $usersnippetsPath -frameworkPrefix $frameworkPrefix)
-        $snippets += (Get-PAFSnippets -snippetsPath $systemsnippetsPath -frameworkPrefix $frameworkPrefix)
+        # Caching snippets to avoid repeated file I/O
+        $script:cachedSnippets = @()
+        $script:cachedSnippets += (Get-PAFSnippets -snippetsPath $usersnippetsPath -frameworkPrefix $frameworkPrefix)
+        $script:cachedSnippets += (Get-PAFSnippets -snippetsPath $systemsnippetsPath -frameworkPrefix $frameworkPrefix)
 
-        Show-PAFSnippetMenu2 -snippets $snippets -usersnippetsPath $usersnippetsPath -systemsnippetsPath $systemsnippetsPath -frameworkPrefix $frameworkPrefix
+        Show-PAFSnippetMenu -usersnippetsPath $usersnippetsPath -systemsnippetsPath $systemsnippetsPath -frameworkPrefix $frameworkPrefix
+        Show-PAFSnippetMenu -usersnippetsPath $usersnippetsPath -systemsnippetsPath $systemsnippetsPath -frameworkPrefix $frameworkPrefix -category "" -searchKeywords ""
     }
     catch {
         Write-Error "Error in Start-PAF: $_"

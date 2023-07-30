@@ -6,10 +6,14 @@ This snippet retrieves basic system information such as OS version, computer nam
 This script demonstrates how to retrieve basic system information using WMI and CIM cmdlets.
 #>
 
+
 function Get-SystemInfo {
 <#
 :CATEGORY
 utility
+
+:NAME
+Get-SystemInfo
 #>
 $osVersion = Get-WmiObject -Class Win32_OperatingSystem | Select-Object -ExpandProperty Caption
     $computerName = $env:COMPUTERNAME
@@ -23,3 +27,4 @@ $osVersion = Get-WmiObject -Class Win32_OperatingSystem | Select-Object -ExpandP
 
     return $systemInfo
 }
+Get-SystemInfo

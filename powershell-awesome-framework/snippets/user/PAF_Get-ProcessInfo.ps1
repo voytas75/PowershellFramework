@@ -1,15 +1,21 @@
-function Get-ProcessInfo {
 <#
 .SYNOPSIS
+
 This snippet get processes info.
 
 .DESCRIPTION
+
 This script demonstrates how to retrieve basic process information.
 #>
 
+
+function Get-ProcessInfo {
 <#
 :CATEGORY
 System Information
+
+:NAME
+Get-ProcessInfo
 #>
 [CmdletBinding()]
     param (
@@ -38,3 +44,4 @@ System Information
         Write-Error "Process '$ProcessName' not found."
     }
 }
+Get-ProcessInfo
