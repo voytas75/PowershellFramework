@@ -20,9 +20,9 @@ The PowerShell Awesome Framework is a versatile and user-friendly PowerShell mod
 
 5. **Pagination for Large Collections:** Manage a large number of snippets efficiently with built-in pagination. Navigate through multiple pages of snippets with ease, enabling access to a vast array of functionalities.
 
-6. **Keyword-Based Search:** Utilize the search functionality to filter snippets based on keywords. Perform quick searches to locate specific snippets within extensive collections.
+6. **TODO:** *Keyword-Based Search:* Utilize the search functionality to filter snippets based on keywords. Perform quick searches to locate specific snippets within extensive collections.
 
-7. REMOVED: **Color Output Option:** Choose your preferred visual representation by enabling or disabling color output in the menu. Adapt the framework to match your terminal settings and preferences.
+7. **REMOVED:** *Color Output Option:* Choose your preferred visual representation by enabling or disabling color output in the menu. Adapt the framework to match your terminal settings and preferences.
 
 8. **Startup Banner Option:** Decide whether to display a startup banner when loading the framework. Customize the banner to display essential information or updates.
 
