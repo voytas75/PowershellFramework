@@ -22,17 +22,17 @@ The PowerShell Awesome Framework is a versatile and user-friendly PowerShell mod
 
 6. **Keyword-Based Search:** Utilize the search functionality to filter snippets based on keywords. Perform quick searches to locate specific snippets within extensive collections.
 
-7. **Color Output Option:** Choose your preferred visual representation by enabling or disabling color output in the menu. Adapt the framework to match your terminal settings and preferences.
+7. REMOVED: **Color Output Option:** Choose your preferred visual representation by enabling or disabling color output in the menu. Adapt the framework to match your terminal settings and preferences.
 
 8. **Startup Banner Option:** Decide whether to display a startup banner when loading the framework. Customize the banner to display essential information or updates.
 
 ## Usage
 
-1. **Load Core Snippets:** Use the `Load-Snippets` command to load the core framework snippets from the main path specified in the configuration file.
+1. **Stat framework:** Use the `Start-PAF`to load the framework menu.
 
-2. **Load User Snippets:** Employ the `Load-UserSnippets` command to load your custom snippets from the additional user snippets folder path. Access your personalized code effortlessly.
+2. **Display configuration:** Employ the `Get-PAFConfiguration` command to load your custom configuration.
 
-3. **Display Snippet Menu:** Invoke the `Show-SnippetMenu` command to display the main menu with categorized snippets. Navigate and execute snippets efficiently using keyboard shortcuts.
+3. **Save configuration:** Invoke the `Save-PAFConfiguration` command to save configuration.
 
 ## Getting Started
 
@@ -41,6 +41,8 @@ The PowerShell Awesome Framework is a versatile and user-friendly PowerShell mod
 2. **Modify Configuration:** Customize the `config.json` file to match your preferred settings, including the paths for core snippets and user-specific snippets.
 
 3. **Load the Framework:** Import the framework module into your PowerShell session using `Import-Module` and get started with your scripting journey.
+
+4. **Stat framework:** Use the `Start-PAF`to load the framework menu.
 
 ### Contributing
 

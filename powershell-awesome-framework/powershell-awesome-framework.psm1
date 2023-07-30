@@ -28,7 +28,6 @@ function Get-PAFDefaultConfiguration {
         "DefaultModulePath"   = $PSScriptRoot
         "SnippetsPath"        = "${PSScriptRoot}\snippets\core"
         "UserSnippetsPath"    = "${PSScriptRoot}\snippets\user"
-        "UseColorOutput"      = $true
         "MaxSnippetsPerPage"  = 10
         "ShowBannerOnStartup" = $true
         "FrameworkPrefix"     = "PAF_"
@@ -83,7 +82,7 @@ function Get-PAFSnippets {
             $functionName = $file.FullName -replace ($frameworkPrefix, "")
             $functionName = $functionName -replace (".ps1", "")
             #$functionName
-            Write-Verbose ($file | Out-String) -Verbose
+            Write-Verbose ($file | Out-String)
 
             #$functionScriptBlock = (Get-Command (split-path $functionName -Leaf)).ScriptBlock
             $functionScriptBlock = Get-Content -Path $file.FullName -Raw
@@ -320,19 +319,36 @@ function Start-PAF {
         $systemsnippetsPath = $configData.SnippetsPath
         $frameworkPrefix = $configData.FrameworkPrefix
 
+        if($configData.ShowBannerOnStartup -and $null -eq $bannerShowed ) {
+            get-banner
+            $bannerShowed = $true
+        }
+
         # Caching snippets to avoid repeated file I/O
         $script:cachedSnippets = @()
         $script:cachedSnippets += (Get-PAFSnippets -snippetsPath $usersnippetsPath -frameworkPrefix $frameworkPrefix)
+
         $script:cachedSnippets += (Get-PAFSnippets -snippetsPath $systemsnippetsPath -frameworkPrefix $frameworkPrefix)
 
         Show-PAFSnippetMenu -usersnippetsPath $usersnippetsPath -systemsnippetsPath $systemsnippetsPath -frameworkPrefix $frameworkPrefix
-        Show-PAFSnippetMenu -usersnippetsPath $usersnippetsPath -systemsnippetsPath $systemsnippetsPath -frameworkPrefix $frameworkPrefix -category "" -searchKeywords ""
+        Start-PAF
     }
     catch {
         Write-Error "Error in Start-PAF: $_"
     }
 }
 
+
+function Get-Banner {
+    param (
+        
+    )
+    
+    $banner = get-content -Path "./images/banner.txt"
+    Write-Output $banner
+    return
+
+}
 
 # Export the functions to make them available to users of the module
 #Export-ModuleMember -Function Read-Configuration, Save-Configuration, Get-Snippets, Get-UserSnippets, Show-SnippetMenu
@@ -379,4 +395,4 @@ function Start-PAF {
 
 
 # Create fingerprint
-..\helpers\moduleFingerprint.ps1
+#..\helpers\moduleFingerprint.ps1

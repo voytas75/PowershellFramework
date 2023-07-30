@@ -11,6 +11,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - `Get-PAFScriptBlockName`
 - show menu after invoke snippet script
 - Support for no catagory and function name
+- `Get-Banner`
 
 ### Changed
 

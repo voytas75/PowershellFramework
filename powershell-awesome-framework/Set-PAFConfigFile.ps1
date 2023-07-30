@@ -4,7 +4,6 @@ $frameworkData = [PSCustomObject]@{
     "DefaultModulePath"   = "${PSScriptRoot}"
     "SnippetsPath"        = "${PSScriptRoot}\snippets\core"
     "UserSnippetsPath"    = "${PSScriptRoot}\Snippets\user"
-    "UseColorOutput"      = $true
     "MaxSnippetsPerPage"  = 10
     "ShowBannerOnStartup" = $true
     "FrameworkPrefix"     = "PAF_"
@@ -20,4 +19,4 @@ $jsonFilePath = "${PSScriptRoot}\config.json"
 $jsonData | Out-File -FilePath $jsonFilePath
 
 # Output a message indicating successful creation
-Write-Verbose "JSON file created successfully at: $jsonFilePath" -Verbose
+Write-Verbose "JSON file created successfully at: $jsonFilePath"

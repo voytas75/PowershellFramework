@@ -7,7 +7,11 @@
     CompanyName       = 'Script Savvy Ninja'
     Description       = 'Description of your module'
     PowerShellVersion = '5.1'
-    FunctionsToExport = '*'
+    FunctionsToExport = @(
+        "Start-PAF",
+        "Get-PAFConfiguration",
+        "Save-PAFConfiguration"
+    )
     # Cmdlets to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no cmdlets to export.
     CmdletsToExport   = @()
     # Variables to export from this module
