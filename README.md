@@ -2,7 +2,7 @@
 
 ![PowerShell Awesome Framework](https://github.com/voytas75/PowershellFramework/blob/master/images/gears.png?raw=true "PowerShell Awesome Framework")
 
-[![License](https://img.shields.io/github/license/voytas75/PowershellFramework)](https://github.com/voytas75/PowershellFramework/blob/master/LICENSE)
+![status](https://img.shields.io/badge/status-DEV-red)
 
 ## Overview
 
