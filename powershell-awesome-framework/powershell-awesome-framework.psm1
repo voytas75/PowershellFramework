@@ -88,8 +88,12 @@ function Get-PAFSnippets {
             #$functionScriptBlock = (Get-Command (split-path $functionName -Leaf)).ScriptBlock
             $functionScriptBlock = Get-Content -Path $file.FullName -Raw
             $category = Get-PAFScriptBlockCategory -ScriptBlock $functionScriptBlock
-            $functionName = Get-PAFScriptBlockName -ScriptBlock $functionScriptBlock
+            if ($null -eq $category) {
+                $category = "No category"            }
 
+            $functionName = Get-PAFScriptBlockName -ScriptBlock $functionScriptBlock
+            if ($null -eq $functionName) {
+                $functionName = $file.FullName            }
             $metadata = Get-Help -Name $file.FullName -full | `
                 Select-Object -Property Synopsis, `
             @{l = "Description"; e = { $_.Description.Text } }, `

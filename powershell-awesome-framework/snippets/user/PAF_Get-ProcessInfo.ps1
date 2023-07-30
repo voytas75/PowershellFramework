@@ -1,11 +1,11 @@
 <#
 .SYNOPSIS
 
-This snippet get processes info.
+Get processes info.
 
 .DESCRIPTION
 
-This script demonstrates how to retrieve basic process information.
+This script retrieves basic process information. Default process is 'system'
 #>
 
 
@@ -24,8 +24,15 @@ Get-ProcessInfo
     )
 
     try {
+        if (-not $PSBoundParameters.ContainsKey('ProcessName')) {
+            Write-Host "'ProcessName' used default value: $ProcessName"
+        } else {
+            Write-Host "'ProcessName' explicitly provided: $ProcessName"
+        }
+    
+
         $process = Get-Process -Name $ProcessName -ErrorAction Stop
-        $processInfo = @{
+        $processInfo = [pscustomobject][ordered]@{
             Name               = $process.ProcessName
             ID                 = $process.Id
             Path               = $process.Path
@@ -44,4 +51,9 @@ Get-ProcessInfo
         Write-Error "Process '$ProcessName' not found."
     }
 }
-Get-ProcessInfo
+$process = (Read-Host -Prompt "Provide process name")
+if ($process) {
+    Get-ProcessInfo -ProcessName $process
+} else {
+    Get-ProcessInfo 
+}
