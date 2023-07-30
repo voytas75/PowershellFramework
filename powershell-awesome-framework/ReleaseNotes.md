@@ -17,6 +17,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 - snippet req. for PAF
 - no recurse on `Show-PAFSnippetMenu`
+- merged functions
 
 ## [0.0.4] - 2023.07.28
 
