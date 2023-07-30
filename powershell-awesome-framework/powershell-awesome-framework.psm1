@@ -350,49 +350,6 @@ function Get-Banner {
 
 }
 
-# Export the functions to make them available to users of the module
-#Export-ModuleMember -Function Read-Configuration, Save-Configuration, Get-Snippets, Get-UserSnippets, Show-SnippetMenu
-
-# Example usage of reading and modifying settings
-#$configFilePath = "C:\Path\To\Config\config.json"
-#$configuration = Read-Configuration -configFilePath $configFilePath
-
-# Access specific settings
-#$defaultModulePath = $configuration.DefaultModulePath
-#$useColorOutput = $configuration.UseColorOutput
-
-# Modify settings
-#$configuration.UseColorOutput = $false
-#Save-Configuration -configFilePath $configFilePath -configData $configuration
-
-
-########### TESTS #########
-# read configuration
-#write-output "PSScriptRoot: $PSScriptRoot"
-#Get-ChildItem $PSScriptRoot
-
-#$configData = Read-Configuration
-#$configData
-
-#write-output $PSScriptRoot
-
-
-# Get the snippets using the Get-Snippets function with pipeline input
-#$snippets = $configData | Get-Snippets
-#$snippets
-
-# Get user-defined snippets from the user snippets folder
-#$userSnippets = Get-UserSnippets -UserSnippetsPath $configData.userSnippetsPath
-#$userSnippets
-
-# Function to dynamically load snippets from modules (you can integrate this function as shown in the previous response)
-# Main script to load the framework and display the menu
-#Get-Snippets
-#Get-UserSnippets
-#Show-SnippetMenu
-
-
-
 
 # Create fingerprint
 #..\helpers\moduleFingerprint.ps1
