@@ -3,9 +3,8 @@
    dMP.dMP    dMP"dMP    dMP      
   dMMMMP"    dMMMMMP    dMMMP     
  dMP        dMP dMP    dMP        
-dMP        dMP dMP    dMP         
-
-Powershell Awesome Framework
+dMP        dMP dMP    dMP           Powershell Awesome Framework
 
 by voytas75
 (https://github.com/voytas75/PowershellFramework)
+
