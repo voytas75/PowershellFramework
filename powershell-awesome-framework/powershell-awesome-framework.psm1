@@ -5,19 +5,32 @@ function Get-PAFConfiguration {
         [string]$configFilePath = (Join-Path $PSScriptRoot 'config.json')
     )
 
-    Write-Verbose ((Join-Path $PSScriptRoot 'config.json') | Out-String)
-
+    # Check if the configuration file exists
     if (-not (Test-Path $configFilePath)) {
-        Write-Warning "Configuration file not found. Using default values."
+        Write-Warning "Configuration file not found at '$configFilePath'. Using default values."
         return Get-PAFDefaultConfiguration
     }
 
     try {
-        $configData = Get-Content -Path $configFilePath | ConvertFrom-Json
+        # Read the content of the configuration file and convert it to a JSON object
+        $configData = Get-Content -Path $configFilePath -Raw | ConvertFrom-Json
+
+        # Validate the configuration file structure
+        if (-not $configData.PSObject.Properties.Name -contains "FrameworkName" -or
+            -not $configData.PSObject.Properties.Name -contains "DefaultModulePath" -or
+            -not $configData.PSObject.Properties.Name -contains "SnippetsPath" -or
+            -not $configData.PSObject.Properties.Name -contains "UserSnippetsPath" -or
+            -not $configData.PSObject.Properties.Name -contains "MaxSnippetsPerPage" -or
+            -not $configData.PSObject.Properties.Name -contains "ShowBannerOnStartup" -or
+            -not $configData.PSObject.Properties.Name -contains "FrameworkPrefix") {
+            Write-Warning "Invalid configuration file structure. Using default values."
+            return Get-PAFDefaultConfiguration
+        }
+
         return $configData
     }
     catch {
-        Write-Error "Error reading configuration file: $_"
+        Write-Error "Error reading or parsing the configuration file: $_"
         return $null
     }
 }
@@ -26,13 +39,19 @@ function Get-PAFDefaultConfiguration {
     return @{
         "FrameworkName"       = "PowerShell Awesome Framework"
         "DefaultModulePath"   = $PSScriptRoot
-        "SnippetsPath"        = "${PSScriptRoot}\snippets\core"
-        "UserSnippetsPath"    = "${PSScriptRoot}\snippets\user"
+        "SnippetsPath"        = Join-Path $PSScriptRoot 'snippets\core'
+        "UserSnippetsPath"    = Join-Path $PSScriptRoot 'snippets\user'
         "MaxSnippetsPerPage"  = 10
         "ShowBannerOnStartup" = $true
         "FrameworkPrefix"     = "PAF_"
-    } # Add more keys and default values as needed
+        # Add more configuration options here with their default values
+        # For example:
+        # "Theme"               = "Dark"
+        # "LogFilePath"         = Join-Path $PSScriptRoot 'logs'
+        # "EnableDebugMode"     = $false
+    }
 }
+
 # Function to save updated configuration to JSON file
 function Save-PAFConfiguration {
     param (
@@ -40,7 +59,18 @@ function Save-PAFConfiguration {
         [object]$configData
     )
 
-    $configData | ConvertTo-Json | Set-Content -Path $configFilePath
+    try {
+        # Convert the configuration data to JSON format
+        $jsonConfig = $configData | ConvertTo-Json -Depth 10
+
+        # Save the JSON data to the configuration file
+        $jsonConfig | Set-Content -Path $configFilePath -Encoding UTF8
+
+        Write-Host "Configuration saved to '$configFilePath'."
+    }
+    catch {
+        Write-Error "Error saving configuration to '$configFilePath': $_"
+    }
 }
 
 # Function to load snippets from the main path
@@ -86,11 +116,14 @@ function Get-PAFSnippets {
 
             #$functionScriptBlock = (Get-Command (split-path $functionName -Leaf)).ScriptBlock
             $functionScriptBlock = Get-Content -Path $file.FullName -Raw
-            $category = Get-PAFScriptBlockCategory -ScriptBlock $functionScriptBlock
+            #$functionScriptBlock = 
+            #$category = Get-PAFScriptBlockCategory -ScriptBlock $functionScriptBlock
+            $category = Get-PAFScriptBlockInfo -ScriptBlock $functionScriptBlock -InfoType Category
             if ($null -eq $category) {
                 $category = "No category"            }
 
-            $functionName = Get-PAFScriptBlockName -ScriptBlock $functionScriptBlock
+            #$functionName = Get-PAFScriptBlockName -ScriptBlock $functionScriptBlock
+            $functionName = Get-PAFScriptBlockInfo -ScriptBlock $functionScriptBlock -InfoType FunctionName
             if ($null -eq $functionName) {
                 $functionName = $file.FullName            }
             $metadata = Get-Help -Name $file.FullName -full | `
@@ -114,6 +147,7 @@ function Get-PAFSnippets {
 }
 
 # Main menu function with snippet categories
+
 function Show-PAFSnippetMenu {
     param (
         [string]$searchKeywords = $null,
@@ -136,58 +170,61 @@ function Show-PAFSnippetMenu {
         # Filter snippets based on search keywords
         if ($searchKeywords) {
             $allSnippets = $allSnippets | Where-Object {
-                $_.Name -like "*$searchKeywords*" -or $_.synopsis -like "*$searchKeywords*" -or $_.description -like "*$searchKeywords*"
+                $_.Name -like "*$searchKeywords*" -or $_.Synopsis -like "*$searchKeywords*" -or $_.Description -like "*$searchKeywords*"
             }
         }
 
         # Display categories if no category specified, or display snippets for the chosen category
         if (-not $category) {
             $categories = $allSnippets | Select-Object -ExpandProperty Category -Unique
-            Write-Host "Available Categories:"
-            $categoriesWithNumbers = $categories | ForEach-Object -Begin { $count = 1 } -Process {
-                Write-Host "$count. $_"
-                $count++
+            if ($categories.Count -eq 0) {
+                Write-Host "No categories found. Continuing without category selection."
             }
+            else {
+                Write-Host "Available Categories:"
+                $categoriesWithNumbers = $categories | ForEach-Object -Begin { $count = 1 } -Process {
+                    Write-Host "$count. $_"
+                    $count++
+                }
 
-            # Prompt user for category selection
-            $selection = Read-Host "Enter the number of the category you want to browse (press Enter to continue without search)"
+                # Prompt user for category selection
+                $selection = Read-Host "Enter the number of the category you want to browse (press Enter to continue without search)"
 
-            if ($selection -ge 1 -and $selection -le $categories.Count) {
-                $category = $categories[$selection - 1]
+                if ($selection -ge 1 -and $selection -le $categories.Count) {
+                    $category = $categories[$selection - 1]
+                }
             }
         }
 
-        # Filter snippets based on the chosen category
         if ($category) {
+            # Filter snippets based on the chosen category
             $categorySnippets = @()
             $categorySnippets += $allSnippets | Where-Object {
                 $_.Category -eq $category
             }
 
-            Write-Output "Snippets in '$category' category:"
-            $SnippetsWithNumbers = $categorySnippets | ForEach-Object -Begin { $count = 1 } -Process {
-                Write-Host "$count. $($_.name)"
-                $count++
-            }
-
-<#             $categorySnippets | ForEach-Object {
-                Write-Host "$($_.Name). '$($_.Name)' $($_.Synopsis)"
-            }
- #>
-            # Prompt user to choose a snippet to execute
-            $executeSnippet = Read-Host "Enter the number of the snippet you want to execute (press Enter to continue without execution)"
-            $categorySnippets.Count
-            if ($executeSnippet -ge 1 -and $executeSnippet -le $categorySnippets.Count) {
-                $selectedSnippet = $categorySnippets[$executeSnippet - 1]
-                Write-Host "Executing snippet function: $($selectedSnippet.Name) ($($selectedSnippet.Path))..."
-                Invoke-Expression "& { . $($selectedSnippet.Path) }"
+            if ($categorySnippets.Count -eq 0) {
+                Write-Host "No snippets found in the '$category' category."
             }
             else {
-                Write-Host "Continuing without snippet execution."
+                Write-Output "Snippets in '$category' category:"
+                $SnippetsWithNumbers = $categorySnippets | ForEach-Object -Begin { $count = 1 } -Process {
+                    Write-Host "$count. $($_.Name)"
+                    $count++
+                }
+
+                # Prompt user to choose a snippet to execute
+                $executeSnippet = Read-Host "Enter the number of the snippet you want to execute (press Enter to continue without execution)"
+
+                if ($executeSnippet -ge 1 -and $executeSnippet -le $categorySnippets.Count) {
+                    $selectedSnippet = $categorySnippets[$executeSnippet - 1]
+                    Write-Host "Executing snippet function: $($selectedSnippet.Name) ($($selectedSnippet.Path))..."
+                    Invoke-Expression "& { . $($selectedSnippet.Path) }"
+                }
+                else {
+                    Write-Host "Invalid snippet number or no snippet execution requested."
+                }
             }
-        }
-        else {
-            Write-Host "Continuing without category selection."
         }
     }
     catch {
@@ -195,117 +232,120 @@ function Show-PAFSnippetMenu {
     }
 }
 
-# Gets name of category from snippet; must be definied by user in script
-function Get-PAFScriptBlockCategory {
-<#
-.SYNOPSIS
-    Get the category from a PowerShell script block.
 
-.DESCRIPTION
-    This function extracts the category information from a PowerShell script block that contains the ":CATEGORY" tag.
-
-.PARAMETER ScriptBlock
-    The PowerShell script block from which to extract the category.
-
-.EXAMPLE
-    Get-PAFScriptBlockCategory -ScriptBlock {
-        # Some script code here
-        :CATEGORY
-        MyCategory
-        # More script code
-    }
-    # Output: "MyCategory"
-
-.EXAMPLE
-    > $functionScriptBlock = (Get-Command Get-Example).ScriptBlock
-    > $category = Get-PAFScriptBlockCategory -ScriptBlock $functionScriptBlock
-    > Write-Host "Category: $category"
-    # Output: "Category: Example"
-#>
-
-
-[CmdletBinding()]
+# Gets name of category and function from snippet; must be definied by user in script
+function Get-PAFScriptBlockInfo {
+    [CmdletBinding()]
     param (
         [Parameter(Mandatory = $true, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true)]
-        $ScriptBlock
+        [string]$ScriptBlock,
+
+        [Parameter(Mandatory = $true)]
+        [ValidateSet("FunctionName", "Category")]
+        [string]$InfoType
     )
 
     try {
         # Convert the script block to a string
         $scriptText = $ScriptBlock.ToString()
 
-        # Define the regex pattern to match the :CATEGORY tag
-        $categoryRegex = '.*\:CATEGORY\s+(.+)'
+        # Define simplified regex patterns to match the :NAME and :CATEGORY tags
+        $nameRegex = '.*:NAME\s+(.+)'
+        $categoryRegex = '.*:CATEGORY\s+(.+)'
 
-        # Attempt to find the :CATEGORY tag in the script text
-        $match = $scriptText | Select-String -Pattern $categoryRegex -AllMatches
+        # Initialize variables to hold extracted values
+        $functionName = $null
+        $category = $null
 
-        if ($match.Matches.Count -gt 0) {
-            $category = $match.Matches[0].Groups[1].Value
-            $category = $category.TrimEnd([Environment]::NewLine)
-            return $category
+        # Attempt to find the :NAME and :CATEGORY tags in the script text
+        $nameMatch = $scriptText | Select-String -Pattern $nameRegex -AllMatches
+        $categoryMatch = $scriptText | Select-String -Pattern $categoryRegex -AllMatches
+
+        # Extract the main function name value
+        if ($nameMatch.Matches.Count -gt 0) {
+            $functionName = $nameMatch.Matches[0].Groups[1].Value
+        }
+
+        # Extract the category value
+        if ($categoryMatch.Matches.Count -gt 0) {
+            $category = $categoryMatch.Matches[0].Groups[1].Value
+        }
+
+        # Determine the requested information based on $InfoType
+        switch ($InfoType) {
+            "FunctionName" {
+                return $functionName
+            }
+            "Category" {
+                return $category
+            }
+            default {
+                Write-Warning "Invalid value for InfoType. Use 'FunctionName' or 'Category'."
+                return $null
+            }
         }
     }
     catch {
-        Write-Warning "An error occurred while extracting the category: $_"
+        Write-Warning "An error occurred while extracting the script block information: $_"
     }
 
     return $null
 }
 
-# Gets name of main function in snippet; must be definied by user in script   
-function Get-PAFScriptBlockName {
-<#
-.SYNOPSIS
-    Get the main function name from a PowerShell script block.
 
-.DESCRIPTION
-    This function extracts the main function name information from a PowerShell script block that contains the ":NAME" tag.
-
-.PARAMETER ScriptBlock
-    The PowerShell script block from which to extract the main function name.
-
-.EXAMPLE
-    Get-PAFScriptBlockName -ScriptBlock {
-        # Some script code here
-        :Name 
-        MyName
-        # More script code
-    }
-    # Output: "MyName"
-
-.EXAMPLE
-    > $functionScriptBlock = (Get-Command Get-Example).ScriptBlock
-    > $name = Get-PAFScriptBlockName -ScriptBlock $functionScriptBlock
-    > Write-Host "Name: $name"
-    # Output: "Name: Get-Example"
-#>
-
-
+function Get-PAFScriptBlockInfo2 {
     [CmdletBinding()]
     param (
         [Parameter(Mandatory = $true, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true)]
-        $ScriptBlock
+        [string]$ScriptBlock,
+
+        [Parameter(Mandatory = $true)]
+        [ValidateSet("FunctionName", "Category")]
+        [string]$InfoType
     )
 
     try {
         # Convert the script block to a string
         $scriptText = $ScriptBlock.ToString()
 
-        # Define the regex pattern to match the :NAME tag
+        # Define the regex patterns to match the :NAME and :CATEGORY tags
         $nameRegex = '.*\:NAME\s+(.+)'
+        $categoryRegex = '.*\:CATEGORY\s+(.+)'
 
-        # Attempt to find the :NAME tag in the script text
-        $match = $scriptText | Select-String -Pattern $nameRegex -AllMatches
+        # Initialize variables to hold extracted values
+        $functionName = $null
+        $category = $null
 
-        if ($match.Matches.Count -gt 0) {
-            $name = $match.Matches[0].Groups[1].Value
-            $name = $name.TrimEnd([Environment]::NewLine)
-            return $name
+        # Attempt to find the :NAME and :CATEGORY tags in the script text
+        $nameMatch = $scriptText | Select-String -Pattern $nameRegex -AllMatches
+        $categoryMatch = $scriptText | Select-String -Pattern $categoryRegex -AllMatches
+
+        # Extract the main function name value
+        if ($nameMatch.Matches.Count -gt 0) {
+            $functionName = $nameMatch.Matches[0].Groups[1].Value.TrimEnd([Environment]::NewLine)
+        }
+
+        # Extract the category value
+        if ($categoryMatch.Matches.Count -gt 0) {
+            $category = $categoryMatch.Matches[0].Groups[1].Value.TrimEnd([Environment]::NewLine)
+        }
+
+        # Determine the requested information based on $InfoType
+        switch ($InfoType) {
+            "FunctionName" {
+                return $functionName
+            }
+            "Category" {
+                return $category
+            }
+            default {
+                Write-Warning "Invalid value for InfoType. Use 'FunctionName' or 'Category'."
+                return $null
+            }
         }
     }
     catch {
-        Write-Warning "An error occurred while extracting the name: $_"
+        Write-Warning "An error occurred while extracting the script block information: $_"
     }
 
     return $null
