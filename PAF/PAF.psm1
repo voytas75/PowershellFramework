@@ -350,7 +350,7 @@ function Get-Banner {
         
     )
     
-    $banner = get-content -Path "./images/banner.txt"
+    $banner = get-content -Path "${PSScriptRoot}\images\banner.txt"
     Write-Output $banner
     return
 

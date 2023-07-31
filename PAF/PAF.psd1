@@ -1,6 +1,6 @@
 @{
-    RootModule        = 'powershell-awesome-framework'
-    ModuleVersion     = '0.1.0'
+    RootModule        = 'PAF'
+    ModuleVersion     = '0.1.1'
     GUID              = 'e91f3cc2-9f21-4373-a2e5-b535b4a9eaea'
     Author            = 'Wojciech Napierala (voytas75)'
     Copyright         = '(c) 2023 Wojciech Napierala. All rights reserved.'
