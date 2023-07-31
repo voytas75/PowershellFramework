@@ -5,7 +5,7 @@
     Author            = 'Wojciech Napierala (voytas75)'
     Copyright         = '(c) 2023 Wojciech Napierala. All rights reserved.'
     CompanyName       = 'Script Savvy Ninja'
-    Description       = 'Description of your module'
+    Description       = 'The PowerShell Awesome Framework is a versatile and user-friendly PowerShell module that empowers users to streamline their scripting experience with a collection of useful code snippets. This framework is designed to enhance productivity and simplify the execution of various PowerShell tasks, making it a valuable tool for both beginners and experienced PowerShell users.'
     PowerShellVersion = '5.1'
     FunctionsToExport = @(
         "Start-PAF",
@@ -24,7 +24,9 @@
     
             # Tags applied to this module. These help with module discovery in online galleries.
             Tags       = @(
-                "Framework"
+                "Framework",
+                "snippet"
+
             )
     
             # A URL to the license for this module.
@@ -37,7 +39,7 @@
             IconUri = 'https://raw.githubusercontent.com/voytas75/PowershellFramework/master/powershell-awesome-framework/images/PAF.PNG'
     
             # ReleaseNotes of this module
-            # ReleaseNotes = 'ReleaseNotes.md'
+            ReleaseNotes = 'ReleaseNotes.md'
     
         } # End of PSData hashtable
 
