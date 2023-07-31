@@ -356,6 +356,35 @@ function Get-Banner {
 
 }
 
+# Save the current TLS security protocol to restore it later
+$oldProtocol = [Net.ServicePointManager]::SecurityProtocol
+
+# Switch to using TLS 1.2
+[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+
+# Get the name of the current module
+$ModuleName = "PAF"
+
+# Get the installed version of the module
+$ModuleVersion = [version]"0.1.3"
+
+# Find the latest version of the module in the PSGallery repository
+$LatestModule = Find-Module -Name $ModuleName -Repository PSGallery
+
+try {
+    if ($ModuleVersion -lt $LatestModule.Version) {
+        Write-Host "An update is available for $($ModuleName). Installed version: $($ModuleVersion). Latest version: $($LatestModule.Version)." -ForegroundColor Red
+    } 
+<#     else {
+        Write-Host "The $($ModuleName) module is up-to-date."
+    }
+ #>}
+catch {
+    Write-Error "An error occurred while checking for updates: $_"
+}
+
+# Restore the original TLS security protocol
+[Net.ServicePointManager]::SecurityProtocol = $oldProtocol
 
 # Create fingerprint
 #..\helpers\moduleFingerprint.ps1

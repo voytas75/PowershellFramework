@@ -1,6 +1,6 @@
 @{
     RootModule        = 'PAF'
-    ModuleVersion     = '0.1.1'
+    ModuleVersion     = '0.1.3'
     GUID              = 'e91f3cc2-9f21-4373-a2e5-b535b4a9eaea'
     Author            = 'Wojciech Napierala (voytas75)'
     Copyright         = '(c) 2023 Wojciech Napierala. All rights reserved.'
@@ -36,7 +36,7 @@
             ProjectUri = 'https://github.com/voytas75/PowershellFramework'
     
             # A URL to an icon representing this module.
-            IconUri = 'https://raw.githubusercontent.com/voytas75/PowershellFramework/master/powershell-awesome-framework/images/PAF.PNG'
+            IconUri = 'https://raw.githubusercontent.com/voytas75/PowershellFramework/master/PAF/images/PAF.PNG'
     
             # ReleaseNotes of this module
             ReleaseNotes = 'ReleaseNotes.md'
