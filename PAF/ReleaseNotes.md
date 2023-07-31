@@ -4,15 +4,16 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/) and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## [0.1.4] - 2023.08.01
+## [0.2.0] - 2023.08.01
 
 ### Added
 
-- n/a
+- search functionality
+- save configuration settings
 
 ### Changed
 
-- n/a
+- improved `Show-PAFSnippetMenu` with better error handling and comments
 
 ## [0.1.3] - 2023.07.31
 

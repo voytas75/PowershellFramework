@@ -8,25 +8,25 @@
             "name": "PowerShell: PAF - Start-PAF",
             "type": "PowerShell",
             "request": "launch",
-            "script": "Import-Module \"D:\\dane\\voytas\\Dokumenty\\visual_studio_code\\github\\PowershellFramework\\powershell-awesome-framework\\powershell-awesome-framework.psd1\" -force -verbose;Start-PAF"
+            "script": "Import-Module \"D:\\dane\\voytas\\Dokumenty\\visual_studio_code\\github\\PowershellFramework\\PAF\\PAF.psd1\" -force -verbose;Start-PAF"
         },
         {
             "name": "PowerShell: PAF - Get-PAFUserSnippets",
             "type": "PowerShell",
             "request": "launch",
-            "script": "Import-Module \"D:\\dane\\voytas\\Dokumenty\\visual_studio_code\\github\\PowershellFramework\\powershell-awesome-framework\\powershell-awesome-framework.psd1\" -force -verbose;Get-PAFUserSnippets"
+            "script": "Import-Module \"D:\\dane\\voytas\\Dokumenty\\visual_studio_code\\github\\PowershellFramework\\PAF\\PAF.psd1\" -force -verbose;Get-PAFUserSnippets"
         },
         {
             "name": "PowerShell: PAF - Show-PAFSnippetMenu",
             "type": "PowerShell",
             "request": "launch",
-            "script": "Import-Module \"D:\\dane\\voytas\\Dokumenty\\visual_studio_code\\github\\PowershellFramework\\powershell-awesome-framework\\powershell-awesome-framework.psd1\" -force -verbose;Show-PAFSnippetMenu"
+            "script": "Import-Module \"D:\\dane\\voytas\\Dokumenty\\visual_studio_code\\github\\PowershellFramework\\PAF\\PAF.psd1\" -force -verbose;Show-PAFSnippetMenu"
         },
         {
             "name": "PowerShell: PAF - Get-PAFSnippets",
             "type": "PowerShell",
             "request": "launch",
-            "script": "Import-Module \"D:\\dane\\voytas\\Dokumenty\\visual_studio_code\\github\\PowershellFramework\\powershell-awesome-framework\\powershell-awesome-framework.psd1\" -force -verbose;Get-PAFSnippets"
+            "script": "Import-Module \"D:\\dane\\voytas\\Dokumenty\\visual_studio_code\\github\\PowershellFramework\\PAF\\PAF.psd1\" -force -verbose;Get-PAFSnippets"
         }
     ]
 }

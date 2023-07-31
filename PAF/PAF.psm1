@@ -1,5 +1,5 @@
 # Function to read JSON configuration file
-function Get-PAFConfiguration {
+function Get-PAFConfiguration2 {
     <#
     .SYNOPSIS
     Reads the JSON configuration file and returns the configuration data.
@@ -61,6 +61,63 @@ function Get-PAFConfiguration {
     }
 }
 
+function Get-PAFConfiguration {
+    param (
+        [Parameter(Position = 0)]
+        [string]$ConfigFilePath
+    )
+
+    if (-not $ConfigFilePath) {
+        $ConfigFilePath = (Join-Path $PSScriptRoot 'config.json')
+    }
+
+    # Check if the configuration file exists
+    if (-not (Test-Path $ConfigFilePath)) {
+        Write-Warning "Configuration file not found at '$ConfigFilePath'. Using default values."
+        return Get-PAFDefaultConfiguration
+    }
+
+    try {
+        # Read the content of the configuration file and convert it to a JSON object
+        $ConfigData = Get-Content -Path $ConfigFilePath -Raw | ConvertFrom-Json
+        # add ConfigPath to object
+        $ConfigData | Add-Member -NotePropertyName "ConfigPath" -NotePropertyValue $ConfigFilePath
+
+        # Check if all required properties are present in the configuration data
+        $requiredProperties = @("FrameworkName", "DefaultModulePath", "SnippetsPath", "UserSnippetsPath", "MaxSnippetsPerPage", "ShowBannerOnStartup", "FrameworkPrefix")
+        if (-not (Test-RequiredProperty -Object $ConfigData -Property $requiredProperties)) {
+            Write-Warning "Invalid configuration file structure. Missing required properties. Using default values."
+            return Get-PAFDefaultConfiguration
+        }
+
+        # Return the valid configuration data
+        return $ConfigData
+    }
+    catch {
+        Write-Error "Error reading or parsing the configuration file: $_"
+        return $null
+    }
+}
+
+function Test-RequiredProperty {
+    param (
+        [Parameter(Mandatory = $true)]
+        [object]$Object,
+
+        [Parameter(Mandatory = $true)]
+        [string[]]$Property
+    )
+
+    # Check if all required properties are present in the object
+    foreach ($prop in $Property) {
+        if (-not $Object.PSObject.Properties.Name.Contains($prop)) {
+            return $false
+        }
+    }
+
+    return $true
+}
+
 function Get-PAFDefaultConfiguration {
     return @{
         "FrameworkName"       = "PowerShell Awesome Framework"
@@ -79,7 +136,7 @@ function Get-PAFDefaultConfiguration {
 }
 
 # Function to save updated configuration to JSON file
-function Save-PAFConfiguration {
+function Save-PAFConfiguration2 {
     param (
         [string]$configFilePath,
         [object]$configData
@@ -98,6 +155,132 @@ function Save-PAFConfiguration {
         Write-Error "Error saving configuration to '$configFilePath': $_"
     }
 }
+
+function Save-PAFConfiguration {
+    <#
+    .SYNOPSIS
+
+    Save the PowerShell Awesome Framework (PAF) configuration to a JSON file.
+
+    .DESCRIPTION
+
+    This function allows you to save the configuration data of PAF to a JSON file.
+    You can either save the entire configuration data or an individual setting.
+
+    .PARAMETER ConfigFilePath
+
+    The path to the JSON configuration file. If not specified, the default path is used (script root).
+
+    .PARAMETER ConfigData
+
+    The configuration data object to be saved. If not specified, the default PAF configuration will be used.
+
+    .PARAMETER SettingName
+
+    The name of the individual setting to save. If provided, the function will update and save only this setting.
+
+    .PARAMETER Encoding
+
+    The encoding to be used when saving the configuration data. The default is UTF8.
+
+    .EXAMPLE
+
+    Save-PAFConfiguration -ConfigFilePath "C:\Path\to\config.json"
+    Save the entire PAF configuration to the specified file path.
+
+    .EXAMPLE
+
+    Save-PAFConfiguration -SettingName "FrameworkName" -ConfigFilePath "C:\Path\to\config.json"
+    Save the individual setting 'FrameworkName' to the specified file path.
+
+    .EXAMPLE
+
+    Save-PAFConfiguration -ConfigData $customConfigData -ConfigFilePath "C:\Path\to\config.json"
+    Save the custom configuration data to the specified file path.
+    #>
+
+    [CmdletBinding()]
+    param (
+        [Parameter(Mandatory = $false)]
+        [string]$configFilePath,
+
+        [Parameter(Mandatory = $false)]
+        [object]$configData,
+
+        [string]$settingName = $null, # New parameter to specify the individual setting to save
+
+        [string]$encoding = 'UTF8'
+    )
+  
+    try {
+        # If no parameters are provided, display instructions on how to use the function
+        if (-not $PSBoundParameters.GetEnumerator().MoveNext()) {
+            Write-Host "To save an individual setting, use the following command:"
+            Write-Host "Save-PAFConfiguration -SettingName 'SettingName'"
+
+            Write-Host "`nTo get more help"
+            Write-Host "get-help Save-PAFConfiguration"
+
+            Write-Host "`nTo display setting and values:"
+            Write-Host "Get-PAFConfiguration"
+            
+            return
+        }
+
+        if (-not $configFilePath) {
+            $configFilePath = "${PSScriptRoot}\config.json"
+        }
+
+        if (-not $configData) {
+            $configData = Get-PAFConfiguration
+        }
+
+
+        # Validate the provided file path
+        if (-not (Test-Path -Path $configFilePath)) {
+            Write-Error "The configuration file path '$configFilePath' does not exist."
+            return
+        }
+
+        # Get the list of valid settings from the configuration data
+        $validSettings = $configData.PSObject.Properties.Name
+
+        if ($settingName -ne $null) {
+            # Check if the provided setting is a valid setting in the configuration
+            if ($validSettings -contains $settingName) {
+                # Prompt the user to enter the new value for the setting
+                $newValue = Read-Host "Enter the new value for setting '$settingName'"
+
+                # Update the value of the setting in the configuration data
+                $configData.$settingName = $newValue
+
+                # Save the entire updated configuration data to the configuration file
+                $jsonConfig = $configData | ConvertTo-Json -Depth 10
+
+                # Save the JSON data to the configuration file
+                $jsonConfig | Set-Content -Path $configFilePath -Encoding $encoding
+
+                Write-Host "Setting '$settingName' updated and saved to '$configFilePath'."
+            }
+            else {
+                Write-Error "Setting '$settingName' not found in the configuration data."
+            }
+        }
+        else {
+            # Save the entire configuration data to the configuration file
+            $jsonConfig = $configData | ConvertTo-Json -Depth 10
+
+            # Save the JSON data to the configuration file
+            $jsonConfig | Set-Content -Path $configFilePath -Encoding $encoding
+
+            Write-Host "Configuration saved to '$configFilePath'."
+        }
+    }
+    catch {
+        Write-Error "Error saving configuration to '$configFilePath': $_"
+    }
+}
+
 
 # Function to load snippets from the main path
 function Get-PAFSnippets {
@@ -166,8 +349,8 @@ function Get-PAFSnippets {
 
 
 # Main menu function with snippet categories
-
-function Show-PAFSnippetMenu {
+# Improved Show-PAFSnippetMenu with better error handling and comments
+function Show-PAFSnippetMenu3 {
     param (
         [string]$searchKeywords = $null,
         [string]$category = $null,
@@ -212,13 +395,15 @@ function Show-PAFSnippetMenu {
                 if ($selection -ge 1 -and $selection -le $categories.Count) {
                     $category = $categories[$selection - 1]
                 }
+                else {
+                    Write-Warning "Invalid category number. Continuing without category selection."
+                }
             }
         }
 
         if ($category) {
             # Filter snippets based on the chosen category
-            $categorySnippets = @()
-            $categorySnippets += $allSnippets | Where-Object {
+            [array]$categorySnippets = $allSnippets | Where-Object {
                 $_.Category -eq $category
             }
 
@@ -241,13 +426,147 @@ function Show-PAFSnippetMenu {
                     Invoke-Expression "& { . $($selectedSnippet.Path) }"
                 }
                 else {
-                    Write-Host "Invalid snippet number or no snippet execution requested."
+                    Write-Warning "Invalid snippet number or no snippet execution requested."
                 }
             }
         }
     }
     catch {
-        Write-Error "Error in Show-PAFSnippetMenu: $_"
+        Write-Error "An error occurred in Show-PAFSnippetMenu: $_"
+    }
+}
+
+# Improved Show-PAFSnippetMenu with search functionality and better error handling
+function Show-PAFSnippetMenu {
+    param (
+        [string]$searchKeywords = $null,
+        [string]$category = $null,
+        [string]$usersnippetsPath = $null,
+        [string]$systemsnippetsPath = $null,
+        [string]$frameworkPrefix
+    )
+
+    try {
+        $selectionMade = $false
+
+        # Prompt user for search keywords if not provided as a parameter
+        if (-not $searchKeywords) {
+            $searchKeywords = Read-Host "Enter search keywords to find snippets (press Enter to skip search)"
+        }
+
+        # Caching snippets to avoid repeated file I/O
+        if (-not $script:cachedSnippets) {
+            $script:cachedSnippets = @()
+            $script:cachedSnippets += Get-PAFSnippets -snippetsPath $usersnippetsPath -frameworkPrefix $frameworkPrefix
+            $script:cachedSnippets += Get-PAFSnippets -snippetsPath $systemsnippetsPath -frameworkPrefix $frameworkPrefix
+        }
+
+        $allSnippets = $script:cachedSnippets
+
+        # Filter snippets based on search keywords
+        if ($searchKeywords) {
+            [array]$matchedSnippets = $allSnippets | Where-Object {
+                $_.Name -like "*$searchKeywords*" -or $_.Synopsis -like "*$searchKeywords*" -or $_.Description -like "*$searchKeywords*"
+            }
+
+            if ($matchedSnippets.Count -eq 0) {
+                Write-Host "No snippets found matching the search keywords '$searchKeywords'."
+                return
+            }
+            else {
+                Write-Output "Snippets matching the search keywords '$searchKeywords':"
+                $SnippetsWithNumbers = $matchedSnippets | ForEach-Object -Begin { $count = 1 } -Process {
+                    Write-Host "${count}. $($_.Name)"
+                    $count++
+                }
+
+                # Prompt user to choose a snippet to execute
+                do {
+                    $executeSnippet = Read-Host "Enter the number of the snippet you want to execute (press Enter to search again or 'Q' to quit without execution)"
+
+                    if ($executeSnippet -eq 'Q' -or $executeSnippet -eq 'q') {
+                        return
+                    }
+
+                    if ($executeSnippet -ge 1 -and $executeSnippet -le $matchedSnippets.Count) {
+                        $selectedSnippet = $matchedSnippets[$executeSnippet - 1]
+                        Write-Host "Executing snippet function: $($selectedSnippet.Name) ($($selectedSnippet.Path))..."
+                        Invoke-Expression "& { . $($selectedSnippet.Path) }"
+                        $selectionMade = $true
+                    }
+                    else {
+                        Write-Warning "Invalid snippet number or no snippet execution requested."
+                    }
+                } while (-not $selectionMade)
+
+                return
+            }
+        }
+
+        # Display categories if no category specified, or display snippets for the chosen category
+        if (-not $category) {
+            $categories = $allSnippets | Select-Object -ExpandProperty Category -Unique
+            if ($categories.Count -eq 0) {
+                Write-Host "No categories found. Continuing without category selection."
+            }
+            else {
+                Write-Host "Available Categories:"
+                $categoriesWithNumbers = $categories | ForEach-Object -Begin { $count = 1 } -Process {
+                    Write-Host "${count}. $_"
+                    $count++
+                }
+
+                # Prompt user for category selection
+                $selection = Read-Host "Enter the number of the category you want to browse (press Enter to continue without search)"
+
+                if ($selection -ge 1 -and $selection -le $categories.Count) {
+                    $category = $categories[$selection - 1]
+                }
+                else {
+                    Write-Warning "Invalid category number. Continuing without category selection."
+                }
+            }
+        }
+
+        if ($category) {
+            # Filter snippets based on the chosen category
+            [array]$categorySnippets = $allSnippets | Where-Object {
+                $_.Category -eq $category
+            }
+
+            if ($categorySnippets.Count -eq 0) {
+                Write-Host "No snippets found in the '$category' category."
+            }
+            else {
+                Write-Output "Snippets in '$category' category:"
+                $SnippetsWithNumbers = $categorySnippets | ForEach-Object -Begin { $count = 1 } -Process {
+                    Write-Host "${count}. $($_.Name)"
+                    $count++
+                }
+
+                # Prompt user to choose a snippet to execute
+                do {
+                    $executeSnippet = Read-Host "Enter the number of the snippet you want to execute (press Enter to search again or 'Q' to quit without execution)"
+
+                    if ($executeSnippet -eq 'Q' -or $executeSnippet -eq 'q') {
+                        return
+                    }
+
+                    if ($executeSnippet -ge 1 -and $executeSnippet -le $categorySnippets.Count) {
+                        $selectedSnippet = $categorySnippets[$executeSnippet - 1]
+                        Write-Host "Executing snippet function: $($selectedSnippet.Name) ($($selectedSnippet.Path))..."
+                        Invoke-Expression "& { . $($selectedSnippet.Path) }"
+                        $selectionMade = $true
+                    }
+                    else {
+                        Write-Warning "Invalid snippet number or no snippet execution requested."
+                    }
+                } while (-not $selectionMade)
+            }
+        }
+    }
+    catch {
+        Write-Error "An error occurred in Show-PAFSnippetMenu: $_"
     }
 }
 
@@ -366,7 +685,7 @@ $oldProtocol = [Net.ServicePointManager]::SecurityProtocol
 $ModuleName = "PAF"
 
 # Get the installed version of the module
-$ModuleVersion = [version]"0.1.4"
+$ModuleVersion = [version]"0.2.0"
 
 # Find the latest version of the module in the PSGallery repository
 $LatestModule = Find-Module -Name $ModuleName -Repository PSGallery
@@ -375,10 +694,11 @@ try {
     if ($ModuleVersion -lt $LatestModule.Version) {
         Write-Host "An update is available for $($ModuleName). Installed version: $($ModuleVersion). Latest version: $($LatestModule.Version)." -ForegroundColor Red
     } 
-<#     else {
+    <#     else {
         Write-Host "The $($ModuleName) module is up-to-date."
     }
- #>}
+ #>
+}
 catch {
     Write-Error "An error occurred while checking for updates: $_"
 }

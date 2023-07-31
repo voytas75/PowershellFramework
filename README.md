@@ -2,7 +2,9 @@
 
 ![PowerShell Awesome Framework](https://github.com/voytas75/PowershellFramework/blob/master/images/banerPAF.png?raw=true "PowerShell Awesome Framework")
 
-[![status](https://img.shields.io/badge/status-PROD-green)](https://github.com/voytas75/PowershellFramework/blob/master/PAF/ReleaseNotes.md) &nbsp; [![PowerShell Gallery Version (including pre-releases)](https://img.shields.io/powershellgallery/v/PAF)](https://www.powershellgallery.com/packages/PAF) &nbsp; [![PowerShell Gallery](https://img.shields.io/powershellgallery/dt/PAF)](https://www.powershellgallery.com/packages/PAF)
+[![status](https://img.shields.io/badge/status-PROD%20v0.1.3-green)](https://github.com/voytas75/PowershellFramework/blob/master/PAF/ReleaseNotes.md) &nbsp; [![PowerShell Gallery Version (including pre-releases)](https://img.shields.io/powershellgallery/v/PAF)](https://www.powershellgallery.com/packages/PAF) &nbsp; [![PowerShell Gallery](https://img.shields.io/powershellgallery/dt/PAF)](https://www.powershellgallery.com/packages/PAF)
+
+[![status](https://img.shields.io/badge/status-DEV%20v0.2.0-red)](https://github.com/voytas75/PowershellFramework/blob/master/PAF/ReleaseNotes.md)
 
 ## Overview
 
@@ -20,7 +22,7 @@ The [PowerShell Awesome Framework](https://www.powershellgallery.com/packages/PA
 
 5. **Pagination for Large Collections:** Manage a large number of snippets efficiently with built-in pagination. Navigate through multiple pages of snippets with ease, enabling access to a vast array of functionalities.
 
-6. **TODO:** *Keyword-Based Search:* Utilize the search functionality to filter snippets based on keywords. Perform quick searches to locate specific snippets within extensive collections.
+6. **Keyword-Based Search:** Utilize the search functionality to filter snippets based on keywords. Perform quick searches to locate specific snippets within extensive collections.
 
 7. **REMOVED:** *Color Output Option:* Choose your preferred visual representation by enabling or disabling color output in the menu. Adapt the framework to match your terminal settings and preferences.
 
