@@ -202,7 +202,7 @@ function Show-PAFSnippetMenu {
             else {
                 Write-Host "Available Categories:"
                 $categoriesWithNumbers = $categories | ForEach-Object -Begin { $count = 1 } -Process {
-                    Write-Host "$count. $_"
+                    Write-Host "${count}. $_"
                     $count++
                 }
 
@@ -228,7 +228,7 @@ function Show-PAFSnippetMenu {
             else {
                 Write-Output "Snippets in '$category' category:"
                 $SnippetsWithNumbers = $categorySnippets | ForEach-Object -Begin { $count = 1 } -Process {
-                    Write-Host "$count. $($_.Name)"
+                    Write-Host "${count}. $($_.Name)"
                     $count++
                 }
 
