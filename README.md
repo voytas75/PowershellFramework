@@ -2,7 +2,7 @@
 
 ![PowerShell Awesome Framework](https://github.com/voytas75/PowershellFramework/blob/master/images/banerPAF.png?raw=true "PowerShell Awesome Framework")
 
-[![status](https://img.shields.io/badge/status-DEV-red)](https://github.com/voytas75/PowershellFramework/blob/master/powershell-awesome-framework/ReleaseNotes.md)
+[![status](https://img.shields.io/badge/status-PROD-green)](https://github.com/voytas75/PowershellFramework/blob/master/powershell-awesome-framework/ReleaseNotes.md)
 
 ## Overview
 
