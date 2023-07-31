@@ -2,11 +2,11 @@
 
 ![PowerShell Awesome Framework](https://github.com/voytas75/PowershellFramework/blob/master/images/banerPAF.png?raw=true "PowerShell Awesome Framework")
 
-[![status](https://img.shields.io/badge/status-PROD-green)](https://github.com/voytas75/PowershellFramework/blob/master/powershell-awesome-framework/ReleaseNotes.md) &nbsp; [![PowerShell Gallery](https://img.shields.io/powershellgallery/dt/PAF)](https://www.powershellgallery.com/packages/PAF)
+[![status](https://img.shields.io/badge/status-PROD-green)](https://github.com/voytas75/PowershellFramework/blob/master/PAF/ReleaseNotes.md) &nbsp; [![PowerShell Gallery Version (including pre-releases)](https://img.shields.io/powershellgallery/v/PAF)](https://www.powershellgallery.com/packages/PAF) &nbsp; [![PowerShell Gallery](https://img.shields.io/powershellgallery/dt/PAF)](https://www.powershellgallery.com/packages/PAF)
 
 ## Overview
 
-The PowerShell Awesome Framework is a versatile and user-friendly PowerShell module that empowers users to streamline their scripting experience with a collection of useful code snippets. This framework is designed to enhance productivity and simplify the execution of various PowerShell tasks, making it a valuable tool for both beginners and experienced PowerShell users.
+The [PowerShell Awesome Framework](https://www.powershellgallery.com/packages/PAF) is a versatile and user-friendly PowerShell module that empowers users to streamline their scripting experience with a collection of useful code snippets. This framework is designed to enhance productivity and simplify the execution of various PowerShell tasks, making it a valuable tool for both beginners and experienced PowerShell users.
 
 ## Features
 
@@ -26,27 +26,53 @@ The PowerShell Awesome Framework is a versatile and user-friendly PowerShell mod
 
 8. **Startup Banner Option:** Decide whether to display a startup banner when loading the framework. Customize the banner to display essential information or updates.
 
-## Usage
+## Installation and Usage
 
-1. **Stat framework:** Use the `Start-PAF`to load the framework menu.
+The module is available on [PowerShell Gallery](https://www.powershellgallery.com/packages/PAF).
 
-2. **Display configuration:** Employ the `Get-PAFConfiguration` command to load your custom configuration.
+```powershell
+Install-Module -Name PAF
+```
 
-3. **Save configuration:** Invoke the `Save-PAFConfiguration` command to save configuration.
+Import module
 
-## Getting Started
+```powershell
+Import-Module -Module PAF
+```
 
-1. **Clone the Repository:** Clone the PowerShell Awesome Framework repository to your local machine.
+To get all commands in installed module including cmdlets, functions and aliases:
 
-2. **Modify Configuration:** Customize the `config.json` file to match your preferred settings, including the paths for core snippets and user-specific snippets.
+```powershell
+Get-Command -Module PAF
+```
 
-3. **Load the Framework:** Import the framework module into your PowerShell session using `Import-Module` and get started with your scripting journey.
+Start framework to load the menu.
 
-4. **Stat framework:** Use the `Start-PAF`to load the framework menu.
+```powershell
+Start-PAF
+```
 
-### Contributing
+Display configuration. Employ the `Get-PAFConfiguration` command to load your custom configuration.
+
+```powershell
+Get-PAFConfiguration
+```
+
+Invoke the `Save-PAFConfiguration` command to save configuration.
+
+```powershell
+Save-PAFConfiguration
+```
+
+## Versioning
+
+We use [SemVer](http://semver.org/) for versioning.
+
+## Contributing
 
 We welcome contributions from the community! Feel free to submit pull requests, report issues, or suggest new features to make the framework even more powerful and user-friendly.
+
+**Clone the Repository:** Clone the PowerShell Awesome Framework repository to your local machine.
 
 ### License
 
