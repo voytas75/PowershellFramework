@@ -48,19 +48,19 @@ To get all commands in installed module including cmdlets, functions and aliases
 Get-Command -Module PAF
 ```
 
-Start framework to load the menu.
+Start framework to load the menu (JSON configuration file `config.json` is automatically generated).
 
 ```powershell
 Start-PAF
 ```
 
-Display configuration. Employ the `Get-PAFConfiguration` command to load your custom configuration.
+Display configuration. Employ the `Get-PAFConfiguration` command to load your custom configuration (JSON configuration file `config.json` is automatically generated).
 
 ```powershell
 Get-PAFConfiguration
 ```
 
-Invoke the `Save-PAFConfiguration` command to save configuration.
+Invoke the `Save-PAFConfiguration` command to save configuration (JSON configuration file `config.json` is automatically generated).
 
 ```powershell
 Save-PAFConfiguration
