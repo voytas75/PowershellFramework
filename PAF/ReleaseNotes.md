@@ -19,6 +19,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - improved `Get-PAFScriptBlockInfo` with better error handling
 - way of creating `config.json`
 - user snippet path
+- remove "_" from prefix [#2](https://github.com/voytas75/PowershellFramework/issues/2)
 
 ## [0.1.3] - 2023.07.31
 
