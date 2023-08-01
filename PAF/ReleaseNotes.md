@@ -10,6 +10,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 - search functionality
 - save configuration settings
+- `Write-ErrorLog`
 
 ### Changed
 
