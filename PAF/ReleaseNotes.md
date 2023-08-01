@@ -16,6 +16,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 - improved `Show-PAFSnippetMenu` with better error handling and comments
 - improved `Get-PAFScriptBlockInfo` with better error handling
+- way of creating `config.json`
+- user snippet path
 
 ## [0.1.3] - 2023.07.31
 
