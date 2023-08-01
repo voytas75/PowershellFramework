@@ -105,8 +105,10 @@ function Get-PAFConfiguration {
 
     # Check if the configuration file exists
     if (-not (Test-Path $ConfigFilePath)) {
-        Write-Warning "Configuration file not found at '$ConfigFilePath'. Using default values."
-        return Get-PAFDefaultConfiguration
+        # Create the configuration file with default values
+        $defaultConfigData = Get-PAFDefaultConfiguration
+        $defaultConfigData | ConvertTo-Json -Depth 10 | Set-Content -Path $ConfigFilePath -Encoding UTF8
+        Write-Host "Configuration file created at '$ConfigFilePath'."
     }
 
     try {
@@ -121,9 +123,6 @@ function Get-PAFConfiguration {
             Write-Warning "Invalid configuration file structure. Missing required properties. Using default values."
             return Get-PAFDefaultConfiguration
         }
-
-        # Return the valid configuration data
-        return $ConfigData
     }
     catch {
         Write-Error "Error reading or parsing the configuration file: $_"
@@ -159,11 +158,18 @@ function Test-RequiredProperty {
 # The function returns a hashtable containing various default configuration options.
 #>
 function Get-PAFDefaultConfiguration {
+    $documentsFolder = [Environment]::GetFolderPath("MyDocuments")
+    $newUserSnippetsPath = Join-Path $documentsFolder 'PowerShell Awesome Framework\user_snippets'
+    
+    if (-not (Test-Path -Path $newUserSnippetsPath -PathType Container)) {
+        New-Item -ItemType Directory -Force -Path $newUserSnippetsPath | Out-Null
+    }
+
     return @{
         "FrameworkName"       = "PowerShell Awesome Framework"
         "DefaultModulePath"   = $PSScriptRoot
         "SnippetsPath"        = Join-Path $PSScriptRoot 'snippets\core'
-        "UserSnippetsPath"    = Join-Path $PSScriptRoot 'snippets\user'
+        "UserSnippetsPath"    = $newUserSnippetsPath
         "MaxSnippetsPerPage"  = 10
         "ShowBannerOnStartup" = $true
         "FrameworkPrefix"     = "PAF_"
@@ -366,7 +372,6 @@ function Get-PAFSnippets {
     }
 }
 
-
 # Main menu function with snippet categories
 # Improved Show-PAFSnippetMenu with better error handling and comments
 function Show-PAFSnippetMenu {
@@ -487,7 +492,7 @@ function Show-SnippetExecutionMenu {
         if ($executeSnippet -ge 1 -and $executeSnippet -le $Snippets.Count) {
             $selectedSnippet = $Snippets[$executeSnippet - 1]
             Write-Host "Executing snippet function: $($selectedSnippet.Name) ($($selectedSnippet.Path))..."
-            Invoke-Expression "& { . $($selectedSnippet.Path) }"
+            Invoke-Expression "& { . '$($selectedSnippet.Path)' }"
             $selectionMade = $true
         }
         else {
@@ -495,7 +500,6 @@ function Show-SnippetExecutionMenu {
         }
     } while (-not $selectionMade)
 }
-
 
 # Gets name of category and function from snippet; must be definied by user in script
 function Get-PAFScriptBlockInfo {
