@@ -2,13 +2,94 @@
 Import-Module Microsoft.PowerShell.Utility
 
 # Function to handle and log errors
-function write-ErrorLog {
+function Write-ErrorLog {
+    <#
+    .SYNOPSIS
+    Write an error message and optionally log the error to a file.
+
+    .DESCRIPTION
+    This function writes an error message to the console using Write-Error cmdlet and optionally logs the error message and exception details to a log file.
+
+    .PARAMETER Message
+    The error message to display and log.
+
+    .PARAMETER Exception
+    Optional. The exception object to log to the file. If not provided, only the error message is logged.
+
+    .PARAMETER LogFilePath
+    Optional. The path to the log file. If not specified, the log file will be created in the user-specific temporary directory with the default name "<pfa_prefix>_error.log".
+
+    .PARAMETER LogFilePrefix
+    Optional. The prefix for the log file name. If not specified, the default prefix from the configuration will be used, or "PAF_" if the configuration is not available.
+
+    .PARAMETER Overwrite
+    Optional. If specified, the function will overwrite the log file instead of appending to it.
+
+    .EXAMPLE
+    Write-ErrorLog "An error occurred while processing the data."
+
+    Display the error message on the console and log it to "<pfa_prefix>_error.log" in the user-specific temporary directory.
+
+    .EXAMPLE
+    try {
+        # Some code that may throw an exception
+    }
+    catch {
+        Write-ErrorLog "An error occurred during processing." $_
+    }
+
+    Catch the exception, display the error message on the console, and log both the message and exception details to "<pfa_prefix>_error.log".
+
+    .EXAMPLE
+    Write-ErrorLog "Failed to connect to the server." -LogFilePrefix "MyApp"
+
+    Display the error message on the console and log it to "MyApp_error.log" in the user-specific temporary directory.
+    #>
+
+    [CmdletBinding()]
     param (
+        [Parameter(Mandatory = $true, Position = 0)]
         [string]$Message,
-        [Exception]$Exception
+
+        [Parameter(Position = 1)]
+        [Exception]$Exception,
+
+        [Parameter(Position = 2)]
+        [string]$LogFilePath,
+
+        [string]$LogFilePrefix,
+
+        [switch]$Overwrite
     )
-    Write-Error $Message
-    $Exception | Out-File -Append "error.log"
+
+    try {
+        # Write the error message to the console
+        Write-Error $Message
+
+        # If LogFilePath is not specified, use the user-specific temporary directory as the default location
+        if (-not $LogFilePath) {
+            $logFileName = "${LogFilePrefix}_error.log"
+            $LogFilePath = Join-Path $env:TEMP $logFileName
+        }
+
+        # Create the log file if it doesn't exist and Overwrite switch is not specified
+        if (-not (Test-Path $LogFilePath) -or $Overwrite) {
+            $null = New-Item -Path $LogFilePath -ItemType File
+        }
+
+        # Prepare the log entry
+        $logEntry = "$((Get-Date).ToString('yyyy-MM-dd HH:mm:ss')) - $Message"
+
+        if ($Exception) {
+            $logEntry += "`r`nException:`r`n$($Exception.ToString())"
+        }
+
+        # Append or overwrite the log entry to the log file
+        $logEntry | Out-File -Append:$Overwrite -FilePath $LogFilePath
+    }
+    catch {
+        Write-Warning "An error occurred while writing to the log file: $_"
+    }
 }
 
 # Function to read JSON configuration file
