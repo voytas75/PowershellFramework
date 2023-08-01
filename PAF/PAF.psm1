@@ -290,42 +290,33 @@ function Get-PAFDefaultConfiguration {
 function Save-PAFConfiguration {
     <#
     .SYNOPSIS
-
     Save the PowerShell Awesome Framework (PAF) configuration to a JSON file.
 
     .DESCRIPTION
-
     This function allows you to save the configuration data of PAF to a JSON file.
     You can either save the entire configuration data or an individual setting.
 
     .PARAMETER ConfigFilePath
-
     The path to the JSON configuration file. If not specified, the default path is used (script root).
 
     .PARAMETER ConfigData
-
     The configuration data object to be saved. If not specified, the default PAF configuration will be used.
 
     .PARAMETER SettingName
-
     The name of the individual setting to save. If provided, the function will update and save only this setting.
 
     .PARAMETER Encoding
-
     The encoding to be used when saving the configuration data. The default is UTF8.
 
     .EXAMPLE
-
     Save-PAFConfiguration -ConfigFilePath "C:\Path\to\config.json"
     Save the entire PAF configuration to the specified file path.
 
     .EXAMPLE
-
     Save-PAFConfiguration -SettingName "FrameworkName" -ConfigFilePath "C:\Path\to\config.json"
     Save the individual setting 'FrameworkName' to the specified file path.
 
     .EXAMPLE
-
     Save-PAFConfiguration -ConfigData $customConfigData -ConfigFilePath "C:\Path\to\config.json"
     Save the custom configuration data to the specified file path.
     #>
@@ -338,7 +329,7 @@ function Save-PAFConfiguration {
         [Parameter(Mandatory = $false)]
         [object]$configData,
 
-        [string]$settingName = $null, # New parameter to specify the individual setting to save
+        [string]$settingName = $null,
 
         [string]$encoding = 'UTF8'
     )
@@ -347,13 +338,13 @@ function Save-PAFConfiguration {
         # If no parameters are provided, display instructions on how to use the function
         if (-not $PSBoundParameters.GetEnumerator().MoveNext()) {
             Write-Host "To save an individual setting, use the following command:"
-            Write-Host "Save-PAFConfiguration -SettingName 'SettingName'"
+            Write-Host "Save-PAFConfiguration -SettingName '<SettingName>'"
 
-            Write-Host "`nTo get more help"
-            Write-Host "get-help Save-PAFConfiguration"
-
-            Write-Host "`nTo display setting and values:"
+            Write-Host "`nTo display settings and values:"
             Write-Host "Get-PAFConfiguration"
+
+            Write-Host "`nTo get more help:"
+            Write-Host "Get-Help Save-PAFConfiguration"
             
             return
         }
@@ -365,7 +356,6 @@ function Save-PAFConfiguration {
         if (-not $configData) {
             $configData = Get-PAFConfiguration
         }
-
 
         # Validate the provided file path
         if (-not (Test-Path -Path $configFilePath)) {
