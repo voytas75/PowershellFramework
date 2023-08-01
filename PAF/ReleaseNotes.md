@@ -14,6 +14,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 ### Changed
 
 - improved `Show-PAFSnippetMenu` with better error handling and comments
+- improved `Get-PAFScriptBlockInfo` with better error handling
 
 ## [0.1.3] - 2023.07.31
 
