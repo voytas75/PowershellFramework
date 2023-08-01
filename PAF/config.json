@@ -1,9 +1,0 @@
-﻿{
-    "ShowBannerOnStartup":  true,
-    "SnippetsPath":  "D:\\dane\\voytas\\Dokumenty\\visual_studio_code\\github\\PowershellFramework\\PAF\\snippets\\core",
-    "MaxSnippetsPerPage":  10,
-    "DefaultModulePath":  "D:\\dane\\voytas\\Dokumenty\\visual_studio_code\\github\\PowershellFramework\\PAF",
-    "UserSnippetsPath":  "D:\\dane\\voytas\\Dokumenty\\PowerShell Awesome Framework\\user_snippets",
-    "FrameworkPrefix":  "PAF_",
-    "FrameworkName":  "PowerShell Awesome Framework"
-}
