@@ -135,7 +135,7 @@ function Get-PAFConfiguration {
 
     .LINK
     https://github.com/voytas75/PowershellFramework
-    The GitHub repository for the PowerShell Awesome Framework (replace with the actual repository URL).
+    The GitHub repository for the PowerShell Awesome Framework.
     #>
     [CmdletBinding()]
     param (
@@ -168,8 +168,17 @@ function Get-PAFConfiguration {
         }
 
         # Add the ConfigPath property to the object
-        $ConfigData | Add-Member -NotePropertyName "ConfigPath" -NotePropertyValue $ConfigFilePath
-
+        #$ConfigData | Add-Member -NotePropertyName "ConfigPath" -NotePropertyValue $ConfigFilePath
+        # Check if the function was invoked from a script or directly from the console
+        #Write-verbose "MyInvocation.InvocationName: $($MyInvocation | out-string)" -verbose
+        if ($MyInvocation.CommandOrigin -eq "Runspace") {
+            # The function was called directly from the console
+            Write-Information -MessageData "Config path: '$ConfigFilePath'" -InformationAction Continue
+        }
+        #else {
+        #    # The function was called from a script or another function
+        #    Write-Host "Function executed from a script or another function."
+        #}
         return $ConfigData
     }
     catch {
@@ -258,7 +267,7 @@ function Get-PAFDefaultConfiguration {
 
     .LINK
     https://github.com/voytas75/PowershellFramework
-    The GitHub repository for the PowerShell Awesome Framework (replace with the actual repository URL).
+    The GitHub repository for the PowerShell Awesome Framework.
     #>
     # Define default values for the configuration options
     $documentsFolder = [Environment]::GetFolderPath("MyDocuments")
@@ -467,33 +476,62 @@ function Get-PAFSnippets {
     }
 }
 
-# Main menu function with snippet categories
 # Improved Show-PAFSnippetMenu with better error handling and comments
+# Function to display the menu for executing selected snippets
 function Show-PAFSnippetMenu {
+    <#
+    .SYNOPSIS
+    Display the main menu for the PowerShell Awesome Framework (PAF) snippets.
+
+    .DESCRIPTION
+    This function displays the main menu for the PowerShell Awesome Framework (PAF) snippets.
+    The user can choose to browse snippets by categories, search for snippets, or exit the menu.
+
+    .PARAMETER SearchKeywords
+    Optional. Search keywords to find snippets. If provided, the menu will display matched snippets based on the keywords.
+
+    .EXAMPLE
+    Show-PAFSnippetMenu
+
+    Display the main menu for browsing and searching snippets.
+
+    .EXAMPLE
+    Show-PAFSnippetMenu -SearchKeywords "example"
+
+    Display snippets that match the search keywords "example".
+
+    .NOTES
+    The Show-PAFSnippetMenu function uses the following helper functions to perform its tasks:
+    - Get-PAFSnippets: Retrieves the list of snippets from the specified snippets paths.
+    - Show-SnippetExecutionMenu: Displays the menu for executing selected snippets.
+    - Convert-FirstLetterToUpper: Helper function to capitalize the first letter of a string.
+
+    The menu will keep running until the user decides to exit manually.
+
+    .LINK
+    https://github.com/voytas75/PowershellFramework
+    The GitHub repository for the PowerShell Awesome Framework.
+    #>
+
     [CmdletBinding()]
     param (
         [string]$SearchKeywords = $null,
-        [string]$UserSnippets = $null,
-        [string]$SystemSnippets = $null,
         [string]$FrameworkPrefix
     )
 
     try {
-        if (-not $SearchKeywords) {
-            $SearchKeywords = Read-Host "Enter search keywords to find snippets (press Enter to skip search)"
-        }
+        $usersnippetsPath = (Get-PAFConfiguration).UserSnippetsPath
+        $systemsnippetsPath = (Get-PAFConfiguration).SnippetsPath
 
         # Caching snippets to avoid repeated file I/O
-        if (-not $script:cachedSnippets) {
+        if ($script:cachedSnippets.Length -eq 0) {
             $script:cachedSnippets = @()
-            $script:cachedSnippets += Get-PAFSnippets -SnippetsPath $UserSnippets -FrameworkPrefix $FrameworkPrefix
-            $script:cachedSnippets += Get-PAFSnippets -SnippetsPath $SystemSnippets -FrameworkPrefix $FrameworkPrefix
+            $script:cachedSnippets += Get-PAFSnippets -SnippetsPath $usersnippetsPath -FrameworkPrefix $FrameworkPrefix
+            $script:cachedSnippets += Get-PAFSnippets -SnippetsPath $systemsnippetsPath -FrameworkPrefix $FrameworkPrefix
         }
 
-        $allSnippets = $script:cachedSnippets
-
         if ($SearchKeywords) {
-            [array]$matchedSnippets = $allSnippets | Where-Object {
+            [array]$matchedSnippets = $script:cachedSnippets | Where-Object {
                 $_.Name -like "*$SearchKeywords*" -or $_.Synopsis -like "*$SearchKeywords*" -or $_.Description -like "*$SearchKeywords*"
             }
 
@@ -507,7 +545,7 @@ function Show-PAFSnippetMenu {
             }
         }
 
-        $categories = $allSnippets | Select-Object -ExpandProperty Category -Unique
+        $categories = $script:cachedSnippets | Select-Object -ExpandProperty Category -Unique
         if ($categories.Count -eq 0) {
             Write-Host "No categories found. Continuing without category selection."
             return
@@ -518,83 +556,105 @@ function Show-PAFSnippetMenu {
         $categorySelection += "All Categories"
 
         do {
-            Write-Host "Available Categories:"
-            for ($i = 0; $i -lt $categorySelection.Count; $i++) {
-                Write-Host "$($i + 1). $($categorySelection[$i])"
-            }
+            Write-Host "Main Menu - Available Options:"
+            Write-Host "1. Browse snippets by category"
+            Write-Host "2. Search for snippets"
+            Write-Host "3. Exit"
 
-            $categoryInput = Read-Host "Enter the number of the category you want to browse (press Enter for all categories)"
+            $menuChoice = Read-Host "Enter the number corresponding to your choice"
 
-            if ([string]::IsNullOrEmpty($categoryInput)) {
-                $Category = $null
-                break
-            }
-            elseif ($categoryInput -ge 1 -and $categoryInput -le $categorySelection.Count) {
-                $Category = $categorySelection[$categoryInput - 1]
-                break
-            }
-            else {
-                Write-Warning "Invalid category number. Try again."
-            }
-        } while ($true)
+            switch ($menuChoice) {
+                1 {
+                    $Category = Show-CategorySelectionMenu -CategorySelection $categorySelection
+                    if ($Category -eq "All Categories") {
+                        Show-SnippetExecutionMenu -Snippets $script:cachedSnippets
+                    }
+                    else {
+                        [array]$categorySnippets = $script:cachedSnippets | Where-Object {
+                            $_.Category -eq $Category
+                        }
 
-        if ($Category) {
-            if ($Category -eq "All Categories") {
-                Show-SnippetExecutionMenu -Snippets $allSnippets
-            }
-            else {
-                [array]$categorySnippets = $allSnippets | Where-Object {
-                    $_.Category -eq $Category
+                        if ($categorySnippets.Count -eq 0) {
+                            Write-Host "No snippets found in the '$Category' category."
+                        }
+                        else {
+                            Show-SnippetExecutionMenu -Snippets $categorySnippets
+                        }
+                    }
+                    break
                 }
-
-                if ($categorySnippets.Count -eq 0) {
-                    Write-Host "No snippets found in the '$Category' category."
+                2 {
+                    $searchKeywords = Read-Host "Enter search keywords to find snippets"
+                    Show-PAFSnippetMenu -SearchKeywords $searchKeywords -FrameworkPrefix $FrameworkPrefix
+                    break
                 }
-                else {
-                    Show-SnippetExecutionMenu -Snippets $categorySnippets
+                3 {
+                    return 3
+                }
+                default {
+                    Write-Warning "Invalid menu choice. Please select a valid option."
                 }
             }
-        }
+        } while ($menuChoice -ne 3)
     }
     catch {
         Write-Error "An error occurred in Show-PAFSnippetMenu: $_"
     }
 }
 
-# Function to display the menu for executing selected snippets
+function Show-CategorySelectionMenu {
+    param (
+        [Parameter(Mandatory = $true)]
+        [array]$CategorySelection
+    )
+
+    do {
+        Write-Host "Available Categories:"
+        for ($i = 0; $i -lt $CategorySelection.Count; $i++) {
+            Write-Host "$($i + 1). $($CategorySelection[$i])"
+        }
+
+        $menuChoice = Read-Host "Enter the number corresponding to your choice"
+
+        if ($menuChoice -ge 1 -and $menuChoice -le $CategorySelection.Count) {
+            $selectedCategory = $CategorySelection[$menuChoice - 1]
+            return $selectedCategory
+        }
+        else {
+            Write-Warning "Invalid menu choice. Please select a valid category."
+        }
+    } while ($true)
+}
+
 function Show-SnippetExecutionMenu {
     param (
         [Parameter(Mandatory = $true)]
         [array]$Snippets
     )
 
-    $selectionMade = $false
-
     do {
-        Write-Output "Snippets:"
-        $SnippetsWithNumbers = $Snippets | ForEach-Object -Begin { $count = 1 } -Process {
-            Write-Host "${count}. $($_.Name)"
-            $count++
+        Write-Host "Available Snippets:"
+        for ($i = 0; $i -lt $Snippets.Count; $i++) {
+            Write-Output "$($i + 1). $($Snippets[$i].Name) - $($Snippets[$i].Synopsis)"
         }
 
-        # Prompt user to choose a snippet to execute or search again
-        $executeSnippet = Read-Host "Enter the number of the snippet you want to execute (press Enter to search again or 'Q' to quit without execution)"
+        Write-Host "X. Go back to the main menu"
+        $menuChoice = Read-Host "Enter the number corresponding to the snippet to execute or 'X' to go back"
 
-        if ($executeSnippet -eq 'Q' -or $executeSnippet -eq 'q') {
+        if ($menuChoice -ge 1 -and $menuChoice -le $Snippets.Count) {
+            $selectedSnippet = $Snippets[$menuChoice - 1]
+            Write-Host "Executing snippet: $($selectedSnippet.Name)"
+            Invoke-Expression $selectedSnippet.Path
+        }
+        elseif ($menuChoice -eq "X" -or $menuChoice -eq "x") {
             return
         }
-
-        if ($executeSnippet -ge 1 -and $executeSnippet -le $Snippets.Count) {
-            $selectedSnippet = $Snippets[$executeSnippet - 1]
-            Write-Host "Executing snippet function: $($selectedSnippet.Name) ($($selectedSnippet.Path))..."
-            Invoke-Expression "& { . '$($selectedSnippet.Path)' }"
-            $selectionMade = $true
-        }
         else {
-            Write-Warning "Invalid snippet number or no snippet execution requested."
+            Write-Warning "Invalid menu choice. Please select a valid snippet or 'X' to go back."
         }
-    } while (-not $selectionMade)
+    } while ($true)
 }
+
 
 # Gets name of category and function from snippet; must be definied by user in script
 function Get-PAFScriptBlockInfo {
@@ -636,10 +696,11 @@ function Get-PAFScriptBlockInfo {
         # Determine the requested information based on $InfoType
         switch ($InfoType) {
             "FunctionName" {
-                return $functionName
+                return $functionName.trimEnd()
             }
             "Category" {
-                return (Convert-FirstLetterToUpper -InputString $category)
+                return (Convert-FirstLetterToUpper -InputString $category).trimEnd()
+                #return $category
             }
             default {
                 Write-Warning "Invalid value for InfoType. Use 'FunctionName' or 'Category'."
@@ -704,7 +765,7 @@ The PAF will keep running until the user decides to exit manually.
 
 .LINK
 https://github.com/voytas75/PowershellFramework
-The GitHub repository for the PowerShell Awesome Framework (replace with the actual repository URL).
+The GitHub repository for the PowerShell Awesome Framework.
 
 #>
     try {
@@ -723,15 +784,17 @@ The GitHub repository for the PowerShell Awesome Framework (replace with the act
             $bannerShowed = $true
         }
 
-        while ($true) {
+        while ($exitSnippetMenu -ne 3) {
             
-            # Caching snippets to avoid repeated file I/O
-            $script:cachedSnippets = @()
-            $script:cachedSnippets += (Get-PAFSnippets -snippetsPath $usersnippetsPath -frameworkPrefix $frameworkPrefix)
-
-            $script:cachedSnippets += (Get-PAFSnippets -snippetsPath $systemsnippetsPath -frameworkPrefix $frameworkPrefix)
-
-            Show-PAFSnippetMenu -UserSnippets $usersnippetsPath -SystemSnippets $systemsnippetsPath -frameworkPrefix $frameworkPrefix
+            if ($script:cachedSnippets.Length -eq 0) {
+    
+                # Caching snippets to avoid repeated file I/O
+                $script:cachedSnippets = @()
+                $script:cachedSnippets += (Get-PAFSnippets -snippetsPath $usersnippetsPath -frameworkPrefix $frameworkPrefix)
+                $script:cachedSnippets += (Get-PAFSnippets -snippetsPath $systemsnippetsPath -frameworkPrefix $frameworkPrefix)
+            }
+            #Show-PAFSnippetMenu -UserSnippets $usersnippetsPath -SystemSnippets $systemsnippetsPath -frameworkPrefix $frameworkPrefix
+            $exitSnippetMenu = Show-PAFSnippetMenu -frameworkPrefix $frameworkPrefix
         }
     }
     catch {

@@ -11,7 +11,6 @@ function Get-SystemInfo {
 <#
 :CATEGORY
 utility
-
 :NAME
 Get-SystemInfo
 #>

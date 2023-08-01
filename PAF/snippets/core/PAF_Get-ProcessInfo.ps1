@@ -13,7 +13,6 @@ function Get-ProcessInfo {
 <#
 :CATEGORY
 System Information
-
 :NAME
 Get-ProcessInfo
 #>
