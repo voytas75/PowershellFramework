@@ -12,7 +12,7 @@ The [PowerShell Awesome Framework](https://www.powershellgallery.com/packages/PA
 
 ## Features
 
-1. **Customizable Settings:** The framework includes a JSON configuration file (`config.json`) where users can modify settings to suit their preferences and workflow. Personalize the framework's behavior to match your unique coding needs.
+1. **Customizable Settings**: The framework includes a JSON configuration file `config.json` that is automatically generated when you run the `Start-PAF` command for the first time. This configuration file allows users to modify settings and personalize the framework's behavior to suit their preferences and workflow. You can easily adjust the framework's options to match your unique coding needs by editing the settings in the config.json file.
 
 2. **User-Specific Snippets:** Store your custom snippets in an additional folder path, distinct from the core framework snippets. This feature allows you to maintain personalized code without affecting the core functionality.
 
