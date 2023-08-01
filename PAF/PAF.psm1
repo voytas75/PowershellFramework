@@ -28,7 +28,7 @@ function Write-ErrorLog {
     .EXAMPLE
     Write-ErrorLog "An error occurred while processing the data."
 
-    Display the error message on the console and log it to "<pfa_prefix>_error.log" in the user-specific temporary directory.
+    Display the error message on the console and log it to "_error.log" in the user-specific temporary directory.
 
     .EXAMPLE
     try {
@@ -49,15 +49,17 @@ function Write-ErrorLog {
     [CmdletBinding()]
     param (
         [Parameter(Mandatory = $true, Position = 0)]
+        [ValidateNotNullOrEmpty()]
         [string]$Message,
 
         [Parameter(Position = 1)]
         [Exception]$Exception,
 
         [Parameter(Position = 2)]
+        [ValidateNotNullOrEmpty()]
         [string]$LogFilePath,
 
-        [string]$LogFilePrefix,
+        [string]$LogFilePrefix = "",
 
         [switch]$Overwrite
     )
