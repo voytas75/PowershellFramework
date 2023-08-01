@@ -20,6 +20,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - way of creating `config.json`
 - user snippet path
 - remove "_" from prefix [#2](https://github.com/voytas75/PowershellFramework/issues/2)
+- move `ReleasesNotes.md` to `docs`
 
 ## [0.1.3] - 2023.07.31
 

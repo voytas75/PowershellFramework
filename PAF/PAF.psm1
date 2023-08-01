@@ -97,69 +97,68 @@ function Write-ErrorLog {
 # Function to read JSON configuration file
 function Get-PAFConfiguration {
     <#
-.SYNOPSIS
-Get the configuration data for the PowerShell Awesome Framework (PAF).
+    .SYNOPSIS
+    Get the configuration data for the PowerShell Awesome Framework (PAF).
 
-.DESCRIPTION
-This function retrieves the configuration data for the PowerShell Awesome Framework (PAF) from the JSON configuration file (config.json). If the configuration file does not exist, it will be created with default values. The configuration file allows users to customize settings and personalize the framework's behavior to match their unique coding needs.
+    .DESCRIPTION
+    This function retrieves the configuration data for the PowerShell Awesome Framework (PAF) from the JSON configuration file (config.json). If the configuration file does not exist, it will be created with default values. The configuration file allows users to customize settings and personalize the framework's behavior to match their unique coding needs.
 
-.PARAMETER ConfigFilePath
-Optional. The path to the JSON configuration file. If not specified, the default path is used, which is the same directory as the script where the PAF is imported.
+    .PARAMETER ConfigFilePath
+    Optional. The path to the JSON configuration file. If not specified, the default path is used, which is the same directory as the script where the PAF is imported.
 
-.EXAMPLE
-$configuration = Get-PAFConfiguration
+    .EXAMPLE
+    $configuration = Get-PAFConfiguration
 
-Retrieves the configuration data from the default configuration file path.
+    Retrieves the configuration data from the default configuration file path.
 
-.EXAMPLE
-$customConfigFilePath = "C:\Path\to\custom\config.json"
-$configuration = Get-PAFConfiguration -ConfigFilePath $customConfigFilePath
+    .EXAMPLE
+    $customConfigFilePath = "C:\Path\to\custom\config.json"
+    $configuration = Get-PAFConfiguration -ConfigFilePath $customConfigFilePath
 
-Retrieves the configuration data from a custom configuration file path.
+    Retrieves the configuration data from a custom configuration file path.
 
-.OUTPUTS
-System.Management.Automation.PSCustomObject
-Returns a PowerShell custom object representing the configuration data.
+    .OUTPUTS
+    System.Management.Automation.PSCustomObject
+    Returns a PowerShell custom object representing the configuration data.
 
-.NOTES
-The configuration file (config.json) stores the following properties:
-- FrameworkName: The name of the PowerShell Awesome Framework.
-- DefaultModulePath: The default path where PAF is installed.
-- SnippetsPath: The path to the core snippets directory.
-- UserSnippetsPath: The path to the user-specific snippets directory.
-- MaxSnippetsPerPage: The maximum number of snippets displayed per page in the snippet menu.
-- ShowBannerOnStartup: A boolean value indicating whether to show the PAF banner on startup.
-- FrameworkPrefix: The prefix used to identify PAF-specific snippets.
+    .NOTES
+    The configuration file (config.json) stores the following properties:
+    - FrameworkName: The name of the PowerShell Awesome Framework.
+    - DefaultModulePath: The default path where PAF is installed.
+    - SnippetsPath: The path to the core snippets directory.
+    - UserSnippetsPath: The path to the user-specific snippets directory.
+    - MaxSnippetsPerPage: The maximum number of snippets displayed per page in the snippet menu.
+    - ShowBannerOnStartup: A boolean value indicating whether to show the PAF banner on startup.
+    - FrameworkPrefix: The prefix used to identify PAF-specific snippets.
 
-To customize the configuration, manually edit the values in the config.json file using a text editor.
+    To customize the configuration, manually edit the values in the config.json file using a text editor.
 
-.LINK
-https://github.com/voytas75/PowershellFramework
-The GitHub repository for the PowerShell Awesome Framework (replace with the actual repository URL).
-
-#>
+    .LINK
+    https://github.com/voytas75/PowershellFramework
+    The GitHub repository for the PowerShell Awesome Framework (replace with the actual repository URL).
+    #>
+    [CmdletBinding()]
     param (
         [Parameter(Position = 0)]
         [string]$ConfigFilePath
     )
 
-    if (-not $ConfigFilePath) {
-        $ConfigFilePath = (Join-Path $PSScriptRoot 'config.json')
-    }
-
-    # Check if the configuration file exists
-    if (-not (Test-Path $ConfigFilePath)) {
-        # Create the configuration file with default values
-        $defaultConfigData = Get-PAFDefaultConfiguration
-        $defaultConfigData | ConvertTo-Json -Depth 10 | Set-Content -Path $ConfigFilePath -Encoding UTF8
-        Write-Host "Configuration file created at '$ConfigFilePath'."
-    }
-
     try {
+        # If ConfigFilePath is not specified, use the default path (same directory as the script)
+        if (-not $ConfigFilePath) {
+            $ConfigFilePath = Join-Path $PSScriptRoot 'config.json'
+        }
+
+        # Check if the configuration file exists
+        if (-not (Test-Path $ConfigFilePath)) {
+            # Create the configuration file with default values
+            $defaultConfigData = Get-PAFDefaultConfiguration
+            $defaultConfigData | ConvertTo-Json -Depth 10 | Set-Content -Path $ConfigFilePath -Encoding UTF8
+            Write-Host "Configuration file created at '$ConfigFilePath'."
+        }
+
         # Read the content of the configuration file and convert it to a JSON object
         $ConfigData = Get-Content -Path $ConfigFilePath -Raw | ConvertFrom-Json
-        # add ConfigPath to object
-        $ConfigData | Add-Member -NotePropertyName "ConfigPath" -NotePropertyValue $ConfigFilePath
 
         # Check if all required properties are present in the configuration data
         $requiredProperties = @("FrameworkName", "DefaultModulePath", "SnippetsPath", "UserSnippetsPath", "MaxSnippetsPerPage", "ShowBannerOnStartup", "FrameworkPrefix")
@@ -167,6 +166,9 @@ The GitHub repository for the PowerShell Awesome Framework (replace with the act
             Write-Warning "Invalid configuration file structure. Missing required properties. Using default values."
             return Get-PAFDefaultConfiguration
         }
+
+        # Add the ConfigPath property to the object
+        $ConfigData | Add-Member -NotePropertyName "ConfigPath" -NotePropertyValue $ConfigFilePath
 
         return $ConfigData
     }
@@ -198,19 +200,76 @@ function Test-RequiredProperty {
     }
 }
 
+# Function to test if required properties are present in an object
+function Test-RequiredProperty {
+    param (
+        [Parameter(Mandatory = $true, ValueFromPipeline = $true)]
+        [object]$Object,
+
+        [Parameter(Mandatory = $true)]
+        [string[]]$Property
+    )
+
+    process {
+        foreach ($prop in $Property) {
+            if (-not $Object.PSObject.Properties.Name.Contains($prop)) {
+                Write-Error "Required property '$prop' not found in the object."
+                return $false
+            }
+        }
+
+        return $true
+    }
+}
+
 <# 
 # Function to retrieve the default configuration settings for the PowerShell Awesome Framework (PAF).
 # These settings are used when a configuration file is not found or when required properties are missing in the file.
 # The function returns a hashtable containing various default configuration options.
 #>
 function Get-PAFDefaultConfiguration {
+    <#
+    .SYNOPSIS
+    Get the default configuration settings for the PowerShell Awesome Framework (PAF).
+
+    .DESCRIPTION
+    This function retrieves the default configuration settings for the PowerShell Awesome Framework (PAF). These settings are used when a configuration file is not found or when required properties are missing in the file. The function returns a hashtable containing various default configuration options.
+
+    .EXAMPLE
+    $defaultConfig = Get-PAFDefaultConfiguration
+
+    Retrieves the default configuration settings for PAF.
+
+    .OUTPUTS
+    Hashtable
+    Returns a hashtable representing the default configuration data.
+
+    .NOTES
+    The default configuration includes the following properties:
+    - FrameworkName: The name of the PowerShell Awesome Framework.
+    - DefaultModulePath: The default path where PAF is installed.
+    - SnippetsPath: The path to the core snippets directory.
+    - UserSnippetsPath: The path to the user-specific snippets directory.
+    - MaxSnippetsPerPage: The maximum number of snippets displayed per page in the snippet menu.
+    - ShowBannerOnStartup: A boolean value indicating whether to show the PAF banner on startup.
+    - FrameworkPrefix: The prefix used to identify PAF-specific snippets.
+
+    Additional configuration options can be added to the hashtable as needed.
+
+    .LINK
+    https://github.com/voytas75/PowershellFramework
+    The GitHub repository for the PowerShell Awesome Framework (replace with the actual repository URL).
+    #>
+    # Define default values for the configuration options
     $documentsFolder = [Environment]::GetFolderPath("MyDocuments")
     $newUserSnippetsPath = Join-Path $documentsFolder 'PowerShell Awesome Framework\user_snippets'
-    
+
+    # Ensure the user-specific snippets directory exists
     if (-not (Test-Path -Path $newUserSnippetsPath -PathType Container)) {
         New-Item -ItemType Directory -Force -Path $newUserSnippetsPath | Out-Null
     }
 
+    # Create and return the default configuration hashtable
     return @{
         "FrameworkName"       = "PowerShell Awesome Framework"
         "DefaultModulePath"   = $PSScriptRoot

@@ -39,7 +39,7 @@
             IconUri = 'https://raw.githubusercontent.com/voytas75/PowershellFramework/master/PAF/images/PAF.PNG'
     
             # ReleaseNotes of this module
-            ReleaseNotes = 'ReleaseNotes.md'
+            ReleaseNotes = '/docs/ReleaseNotes.md'
     
         } # End of PSData hashtable
 
