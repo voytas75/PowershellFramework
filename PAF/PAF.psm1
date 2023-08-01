@@ -123,6 +123,8 @@ function Get-PAFConfiguration {
             Write-Warning "Invalid configuration file structure. Missing required properties. Using default values."
             return Get-PAFDefaultConfiguration
         }
+
+        return $ConfigData
     }
     catch {
         Write-Error "Error reading or parsing the configuration file: $_"
@@ -544,7 +546,7 @@ function Get-PAFScriptBlockInfo {
                 return $functionName
             }
             "Category" {
-                return $category
+                return (Convert-FirstLetterToUpper -InputString $category)
             }
             default {
                 Write-Warning "Invalid value for InfoType. Use 'FunctionName' or 'Category'."
@@ -563,6 +565,21 @@ function Get-PAFScriptBlockInfo {
     }
 
     return $null
+}
+
+function Convert-FirstLetterToUpper {
+    param (
+        [string]$InputString
+    )
+
+    if (-not [string]::IsNullOrWhiteSpace($InputString)) {
+        $firstLetter = $InputString.Substring(0, 1).ToUpper()
+        $restOfString = $InputString.Substring(1)
+        $convertedString = $firstLetter + $restOfString
+        return $convertedString
+    }
+
+    return $InputString
 }
 
 # Function to start the PowerShell Awesome Framework
