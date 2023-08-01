@@ -17,10 +17,10 @@ function Write-ErrorLog {
     Optional. The exception object to log to the file. If not provided, only the error message is logged.
 
     .PARAMETER LogFilePath
-    Optional. The path to the log file. If not specified, the log file will be created in the user-specific temporary directory with the default name "<pfa_prefix>_error.log".
+    Optional. The path to the log file. If not specified, the log file will be created in the user-specific temporary directory with the default name "_error.log".
 
     .PARAMETER LogFilePrefix
-    Optional. The prefix for the log file name. If not specified, the default prefix from the configuration will be used, or "PAF_" if the configuration is not available.
+    Optional. The prefix for the log file name.
 
     .PARAMETER Overwrite
     Optional. If specified, the function will overwrite the log file instead of appending to it.
@@ -94,6 +94,48 @@ function Write-ErrorLog {
 
 # Function to read JSON configuration file
 function Get-PAFConfiguration {
+    <#
+.SYNOPSIS
+Get the configuration data for the PowerShell Awesome Framework (PAF).
+
+.DESCRIPTION
+This function retrieves the configuration data for the PowerShell Awesome Framework (PAF) from the JSON configuration file (config.json). If the configuration file does not exist, it will be created with default values. The configuration file allows users to customize settings and personalize the framework's behavior to match their unique coding needs.
+
+.PARAMETER ConfigFilePath
+Optional. The path to the JSON configuration file. If not specified, the default path is used, which is the same directory as the script where the PAF is imported.
+
+.EXAMPLE
+$configuration = Get-PAFConfiguration
+
+Retrieves the configuration data from the default configuration file path.
+
+.EXAMPLE
+$customConfigFilePath = "C:\Path\to\custom\config.json"
+$configuration = Get-PAFConfiguration -ConfigFilePath $customConfigFilePath
+
+Retrieves the configuration data from a custom configuration file path.
+
+.OUTPUTS
+System.Management.Automation.PSCustomObject
+Returns a PowerShell custom object representing the configuration data.
+
+.NOTES
+The configuration file (config.json) stores the following properties:
+- FrameworkName: The name of the PowerShell Awesome Framework.
+- DefaultModulePath: The default path where PAF is installed.
+- SnippetsPath: The path to the core snippets directory.
+- UserSnippetsPath: The path to the user-specific snippets directory.
+- MaxSnippetsPerPage: The maximum number of snippets displayed per page in the snippet menu.
+- ShowBannerOnStartup: A boolean value indicating whether to show the PAF banner on startup.
+- FrameworkPrefix: The prefix used to identify PAF-specific snippets.
+
+To customize the configuration, manually edit the values in the config.json file using a text editor.
+
+.LINK
+https://github.com/voytas75/PowershellFramework
+The GitHub repository for the PowerShell Awesome Framework (replace with the actual repository URL).
+
+#>
     param (
         [Parameter(Position = 0)]
         [string]$ConfigFilePath
@@ -174,7 +216,7 @@ function Get-PAFDefaultConfiguration {
         "UserSnippetsPath"    = $newUserSnippetsPath
         "MaxSnippetsPerPage"  = 10
         "ShowBannerOnStartup" = $true
-        "FrameworkPrefix"     = "PAF_"
+        "FrameworkPrefix"     = "PAF"
         # Add more configuration options here with their default values
         # For example:
         # "Theme"               = "Dark"
@@ -584,6 +626,36 @@ function Convert-FirstLetterToUpper {
 
 # Function to start the PowerShell Awesome Framework
 function Start-PAF {
+    <#
+.SYNOPSIS
+Start the PowerShell Awesome Framework (PAF) and display the main menu of snippets.
+
+.DESCRIPTION
+This function starts the PowerShell Awesome Framework (PAF) and displays the main menu of snippets. The PAF configuration is retrieved using the Get-PAFConfiguration function. If the configuration cannot be loaded, an error is displayed, and PAF exits. The function then proceeds to cache the snippets to avoid repeated file I/O and displays the main menu to the user.
+
+.PARAMETER None
+No parameters are required.
+
+.EXAMPLE
+Start-PAF
+
+Starts the PowerShell Awesome Framework (PAF) and displays the main menu.
+
+.NOTES
+The Start-PAF function uses the following helper functions to perform its tasks:
+- Get-PAFConfiguration: Retrieves the PAF configuration data from the JSON configuration file.
+- Get-PAFSnippets: Retrieves the list of snippets from the specified snippets paths.
+- Show-PAFSnippetMenu: Displays the main menu of snippets to the user.
+
+The PAF main menu allows users to view snippets by categories, search for snippets, and execute chosen snippets.
+
+The PAF will keep running until the user decides to exit manually.
+
+.LINK
+https://github.com/voytas75/PowershellFramework
+The GitHub repository for the PowerShell Awesome Framework (replace with the actual repository URL).
+
+#>
     try {
         $configData = Get-PAFConfiguration
         if ($null -eq $configData) {
