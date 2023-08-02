@@ -103,7 +103,7 @@ Snippet files must meet the following requirements:
 
 4. snippet must have logic execute all what user want to.
 
-Template file [`PAF_Get-Example.ps1`](.\PAF\snippets\user\PAF_Get-Example.ps1) for snippet is in module folder `snippets\user`.
+Template file [`PAF_Get-Example.ps1`](/PAF/snippets/user/PAF_Get-Example.ps1) for snippet is in module folder `snippets\user`.
 
 ## Versioning
 
