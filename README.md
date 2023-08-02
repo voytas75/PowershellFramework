@@ -66,7 +66,7 @@ Invoke the `Save-PAFConfiguration` command to save configuration (JSON configura
 Save-PAFConfiguration
 ```
 
-## Function snippets
+## Adding Function Snippets to PowerShell Awesome Module
 
 To prepare a function snippet for adding it to the PowerShell Awesome Module, follow these steps:
 
