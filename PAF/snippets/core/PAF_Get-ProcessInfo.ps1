@@ -51,6 +51,9 @@ Get-ProcessInfo
         Write-Error "Process '$ProcessName' not found."
     }
 }
+
+# main
+
 $process = (Read-Host -Prompt "Provide process name")
 if ($process) {
     (Get-ProcessInfo -ProcessName $process)

@@ -2,9 +2,9 @@
 
 ![PowerShell Awesome Framework](https://github.com/voytas75/PowershellFramework/blob/master/images/banerPAF.png?raw=true "PowerShell Awesome Framework")
 
-[![status](https://img.shields.io/badge/status-PROD%20v0.1.3-green)](https://github.com/voytas75/PowershellFramework/blob/master/PAF/ReleaseNotes.md) &nbsp; [![PowerShell Gallery Version (including pre-releases)](https://img.shields.io/powershellgallery/v/PAF)](https://www.powershellgallery.com/packages/PAF) &nbsp; [![PowerShell Gallery](https://img.shields.io/powershellgallery/dt/PAF)](https://www.powershellgallery.com/packages/PAF)
+[![status](https://img.shields.io/badge/status-PROD%20v0.2.0-green)](https://github.com/voytas75/PowershellFramework/blob/master/PAF/ReleaseNotes.md) &nbsp; [![PowerShell Gallery Version (including pre-releases)](https://img.shields.io/powershellgallery/v/PAF)](https://www.powershellgallery.com/packages/PAF) &nbsp; [![PowerShell Gallery](https://img.shields.io/powershellgallery/dt/PAF)](https://www.powershellgallery.com/packages/PAF)
 
-[![status](https://img.shields.io/badge/status-DEV%20v0.2.0-red)](https://github.com/voytas75/PowershellFramework/blob/master/PAF/ReleaseNotes.md)
+[![status](https://img.shields.io/badge/status-DEV%20v0.2.1-red)](https://github.com/voytas75/PowershellFramework/blob/master/PAF/ReleaseNotes.md)
 
 ## Overview
 
@@ -65,6 +65,45 @@ Invoke the `Save-PAFConfiguration` command to save configuration (JSON configura
 ```powershell
 Save-PAFConfiguration
 ```
+
+## Function snippets
+
+Function snippets can be added to module in two folders:
+
+1. `$PSRootPath\sippets\core\`
+2. `$([Environment]::GetFolderPath("MyDocuments"))\PowerShell Awesome Framework\user_snippets\`
+
+Snippet files must meet the following requirements: 
+
+1. Prefix in name of snippet file (i.e. 'PAF_Get-Example.ps1')
+2. Inline help at top of file and with two empty line after it:
+
+    ```powershell
+    <#
+    .SYNOPSIS
+
+    Template
+
+    .DESCRIPTION
+
+    Template file to show how prepare function snippet for PowerShell Awesome Module
+    #>
+    ```
+
+3. 'category' and 'name' after in function body below function declaration line, as follows:
+
+    ```powershell
+    <#
+    :CATEGORY
+    put here name of categor
+    :NAME
+    Get-Example
+    #>
+    ```
+
+4. snippet must have logic execute all what user want to.
+
+Template file [`PAF_Get-Example.ps1`](PAF\snippets\user\PAF_Get-Example.ps1) for snippet is in module folder `snippets\user`.
 
 ## Versioning
 
