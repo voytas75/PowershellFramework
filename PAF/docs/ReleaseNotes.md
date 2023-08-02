@@ -12,7 +12,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ### Changed
 
-- n/a
+- snippet template
+- deleted an unnecessary `snippets\user` folder
 
 ## [0.2.1] - 2023.08.02
 

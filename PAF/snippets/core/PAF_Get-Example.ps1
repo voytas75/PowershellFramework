@@ -5,25 +5,25 @@ Template
 
 .DESCRIPTION
 
-Template file to show how prepare function snippet for PowerShell Awesome Module
+This is a template file demonstrating how to prepare a function snippet for the PowerShell Awesome Module.
 #>
 
 
 function Get-Example {
     <#
 :CATEGORY
-put here name of category
+Put here the name of the category
 :NAME
 Get-Example
 #>
     [CmdletBinding()]
     param (    )
 
-    # here code of function snippet
+    # Here goes the code for the function snippet
     return @"
-To prepare function snippet for PAF you must prepare code in specific way:
-1. Add prefix to name of snippet file (i.e. 'PAF_Get-Example.ps1')
-2. Add inline help at top of file and with two empty line after it:
+To prepare a function snippet for PAF, you must follow these steps:
+1. Add a prefix to the name of the snippet file (e.g., 'PAF_Get-Example.ps1').
+2. Add inline help at the top of the file, and leave two empty lines after it:
 <#
 .SYNOPSIS
 
@@ -31,21 +31,20 @@ Template
 
 .DESCRIPTION
 
-Template file to show how prepare function snippet for PowerShell Awesome Module
+This is a template file demonstrating how to prepare a function snippet for the PowerShell Awesome Module.
 #>
 
-3. Add 'category' and 'name' after in function body below function declaration line, as follows:
+3. Inside the function body, include 'category' and 'name' tags after the function declaration line, as follows:
 <#
 :CATEGORY
-put here name of categor
+Put here the name of the category
 :NAME
 Get-Example
 #>
 
-4. snippet must have logic execute all what user want to.
+4. Ensure the snippet contains logic to execute all the desired functionality.
 "@
 }
 
-# snippet must have code to run function(s) when invoked by PAF.
+# The snippet must have code to run the function(s) when invoked by PAF.
 Get-Example
-
