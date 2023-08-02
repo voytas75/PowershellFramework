@@ -76,7 +76,7 @@ To prepare a function snippet for adding it to the PowerShell Awesome Module, fo
    - `$PSRootPath\snippets\core\`
    - `$([Environment]::GetFolderPath("MyDocuments"))\PowerShell Awesome Framework\user_snippets\`
 
-   Make sure the snippet file has a name with the prefix 'PAF_' followed by the function name. For example: `PAF_Get-Example.ps1`
+   Make sure the snippet file has a name with the prefix 'PAF_' followed by the function name. For example: [`PAF_Get-Example.ps1`](/PAF/snippets/core/PAF_Get-Example.ps1)
 
 2. Add Inline Help:
 
