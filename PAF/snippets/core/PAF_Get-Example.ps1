@@ -12,7 +12,7 @@ Template file to show how prepare function snippet for PowerShell Awesome Module
 function Get-Example {
     <#
 :CATEGORY
-put here name of categor
+put here name of category
 :NAME
 Get-Example
 #>

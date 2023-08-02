@@ -2,9 +2,9 @@
 
 ![PowerShell Awesome Framework](https://github.com/voytas75/PowershellFramework/blob/master/images/banerPAF.png?raw=true "PowerShell Awesome Framework")
 
-[![status](https://img.shields.io/badge/status-PROD%20v0.2.0-green)](https://github.com/voytas75/PowershellFramework/blob/master/PAF/ReleaseNotes.md) &nbsp; [![PowerShell Gallery Version (including pre-releases)](https://img.shields.io/powershellgallery/v/PAF)](https://www.powershellgallery.com/packages/PAF) &nbsp; [![PowerShell Gallery](https://img.shields.io/powershellgallery/dt/PAF)](https://www.powershellgallery.com/packages/PAF)
+[![status](https://img.shields.io/badge/status-PROD%20v0.2.1-green)](https://github.com/voytas75/PowershellFramework/blob/master/PAF/ReleaseNotes.md) &nbsp; [![PowerShell Gallery Version (including pre-releases)](https://img.shields.io/powershellgallery/v/PAF)](https://www.powershellgallery.com/packages/PAF) &nbsp; [![PowerShell Gallery](https://img.shields.io/powershellgallery/dt/PAF)](https://www.powershellgallery.com/packages/PAF)
 
-[![status](https://img.shields.io/badge/status-DEV%20v0.2.1-red)](https://github.com/voytas75/PowershellFramework/blob/master/PAF/ReleaseNotes.md)
+[![status](https://img.shields.io/badge/status-DEV%20v0.2.2-red)](https://github.com/voytas75/PowershellFramework/blob/master/PAF/ReleaseNotes.md)
 
 ## Overview
 
