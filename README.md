@@ -68,42 +68,56 @@ Save-PAFConfiguration
 
 ## Function snippets
 
-Function snippets can be added to module in two folders:
+To prepare a function snippet for adding it to the PowerShell Awesome Module, follow these steps:
 
-1. `$PSRootPath\sippets\core\`
-2. `$([Environment]::GetFolderPath("MyDocuments"))\PowerShell Awesome Framework\user_snippets\`
+1. Create the Snippet File:
 
-Snippet files must meet the following requirements: 
+   Place the snippet file in one of the following folders:
+   - `$PSRootPath\snippets\core\`
+   - `$([Environment]::GetFolderPath("MyDocuments"))\PowerShell Awesome Framework\user_snippets\`
 
-1. Prefix in name of snippet file (i.e. 'PAF_Get-Example.ps1')
-2. Inline help at top of file and with two empty line after it:
+   Make sure the snippet file has a name with the prefix 'PAF_' followed by the function name. For example: `PAF_Get-Example.ps1`
 
-    ```powershell
-    <#
-    .SYNOPSIS
+2. Add Inline Help:
 
-    Template
+   At the top of the snippet file, include inline help using PowerShell comment-based help format. The help should contain a synopsis and description of the snippet. Leave two empty lines after the help section. Here's an example:
 
-    .DESCRIPTION
+   ```powershell
+   <#
+   .SYNOPSIS
 
-    Template file to show how prepare function snippet for PowerShell Awesome Module
-    #>
-    ```
+   Template
 
-3. 'category' and 'name' after in function body below function declaration line, as follows:
+   .DESCRIPTION
 
-    ```powershell
-    <#
-    :CATEGORY
-    put here name of categor
-    :NAME
-    Get-Example
-    #>
-    ```
+   Template file to show how to prepare a function snippet for the PowerShell Awesome Module
+   #>
+   ```
 
-4. snippet must have logic execute all what user want to.
+3. Specify Category and Name in Function Body:
 
-Template file [`PAF_Get-Example.ps1`](/PAF/snippets/core/PAF_Get-Example.ps1) for snippet is in module folder `snippets\core`.
+   Inside the function body, include special tags `:CATEGORY` and `:NAME` to specify the category and name of the snippet. Use the following format:
+
+   ```powershell
+   <#
+   :CATEGORY
+   put here the name of the category
+   :NAME
+   Get-Example
+   #>
+   ```
+
+   Replace `put here the name of the category` with the actual category name, and `Get-Example` with the name of the function that the snippet represents.
+
+4. Ensure Proper Logic:
+
+   Make sure that the snippet contains logic to execute the functionality that the user intends. Test the snippet to ensure it works correctly.
+
+5. Add to PowerShell Awesome Module:
+
+   Once the snippet file is ready, add it to the user snippets folder where it belongs. For example, if the snippet is for a function called `Get-Example`, it would be placed in the `PAF_Get-Example.ps1` file inside the `$([Environment]::GetFolderPath("MyDocuments"))\PowerShell Awesome Framework\user_snippets\` folder.
+
+By following these steps, you can contribute function snippets to the PowerShell Awesome Module effectively. Ensure that your snippets adhere to the guidelines mentioned above for consistency and compatibility with the module.
 
 ## Versioning
 
