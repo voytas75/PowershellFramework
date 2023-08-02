@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/) and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## [0.2.0] - 2023.08.01
+## [0.2.0] - 2023.08.02
 
 ### Added
 
@@ -12,6 +12,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - save configuration settings
 - `Write-ErrorLog`
 - inline help for functions
+- `Load-Snippets`
 
 ### Changed
 

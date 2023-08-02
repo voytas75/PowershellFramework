@@ -209,28 +209,6 @@ function Test-RequiredProperty {
     }
 }
 
-# Function to test if required properties are present in an object
-function Test-RequiredProperty {
-    param (
-        [Parameter(Mandatory = $true, ValueFromPipeline = $true)]
-        [object]$Object,
-
-        [Parameter(Mandatory = $true)]
-        [string[]]$Property
-    )
-
-    process {
-        foreach ($prop in $Property) {
-            if (-not $Object.PSObject.Properties.Name.Contains($prop)) {
-                Write-Error "Required property '$prop' not found in the object."
-                return $false
-            }
-        }
-
-        return $true
-    }
-}
-
 <# 
 # Function to retrieve the default configuration settings for the PowerShell Awesome Framework (PAF).
 # These settings are used when a configuration file is not found or when required properties are missing in the file.
@@ -523,15 +501,32 @@ function Show-PAFSnippetMenu {
         $usersnippetsPath = (Get-PAFConfiguration).UserSnippetsPath
         $systemsnippetsPath = (Get-PAFConfiguration).SnippetsPath
 
-        # Caching snippets to avoid repeated file I/O
-        if ($script:cachedSnippets.Length -eq 0) {
-            $script:cachedSnippets = @()
-            $script:cachedSnippets += Get-PAFSnippets -SnippetsPath $usersnippetsPath -FrameworkPrefix $FrameworkPrefix
-            $script:cachedSnippets += Get-PAFSnippets -SnippetsPath $systemsnippetsPath -FrameworkPrefix $FrameworkPrefix
+        # Define a helper function to load snippets from a given path
+        function Load-Snippets {
+            param (
+                [string]$Path
+            )
+            
+            if (Test-Path -Path $Path) {
+                Get-PAFSnippets -SnippetsPath $Path -FrameworkPrefix $FrameworkPrefix
+            }
+            else {
+                Write-Warning "Invalid snippets path: $Path"
+                return @()
+            }
         }
 
+        # Load snippets based on the search criteria or return all snippets
         if ($SearchKeywords) {
-            [array]$matchedSnippets = $script:cachedSnippets | Where-Object {
+            <#             $allSnippets = @(
+                (Load-Snippets -Path $usersnippetsPath),
+                (Load-Snippets -Path $systemsnippetsPath)
+            )
+ #>            $allSnippets += (Load-Snippets -Path $usersnippetsPath)
+            $allSnippets += (Load-Snippets -Path $systemsnippetsPath)
+            
+
+            $matchedSnippets = $allSnippets | Where-Object {
                 $_.Name -like "*$SearchKeywords*" -or $_.Synopsis -like "*$SearchKeywords*" -or $_.Description -like "*$SearchKeywords*"
             }
 
@@ -544,58 +539,77 @@ function Show-PAFSnippetMenu {
                 return
             }
         }
+        else {
+            # Show a menu for category selection
+            <#             $categories = @(
+                (Load-Snippets -Path $usersnippetsPath | Select-Object -ExpandProperty Category -Unique),
+                (Load-Snippets -Path $systemsnippetsPath | Select-Object -ExpandProperty Category -Unique)
+            )
+            #>
+            $categories += (Load-Snippets -Path $usersnippetsPath | Select-Object -ExpandProperty Category -Unique)
+            $categories += (Load-Snippets -Path $systemsnippetsPath | Select-Object -ExpandProperty Category -Unique)
+            
 
-        $categories = $script:cachedSnippets | Select-Object -ExpandProperty Category -Unique
-        if ($categories.Count -eq 0) {
-            Write-Host "No categories found. Continuing without category selection."
-            return
-        }
+            if ($categories.Count -eq 0) {
+                Write-Host "No categories found. Continuing without category selection."
+                return
+            }
 
-        # Show a menu for category selection
-        $categorySelection = $categories | ForEach-Object { $_ }
-        $categorySelection += "All Categories"
+            $categorySelection = $categories | ForEach-Object { $_ }
+            $categorySelection += "All Categories"
 
-        do {
-            Write-Host "Main Menu - Available Options:"
-            Write-Host "1. Browse snippets by category"
-            Write-Host "2. Search for snippets"
-            Write-Host "3. Exit"
+            do {
+                Write-Host "Main Menu - Available Options:"
+                Write-Host "1. Browse snippets by category"
+                Write-Host "2. Search for snippets"
+                Write-Host "3. Exit"
 
-            $menuChoice = Read-Host "Enter the number corresponding to your choice"
+                $menuChoice = Read-Host "Enter the number corresponding to your choice"
 
-            switch ($menuChoice) {
-                1 {
-                    $Category = Show-CategorySelectionMenu -CategorySelection $categorySelection
-                    if ($Category -eq "All Categories") {
-                        Show-SnippetExecutionMenu -Snippets $script:cachedSnippets
-                    }
-                    else {
-                        [array]$categorySnippets = $script:cachedSnippets | Where-Object {
-                            $_.Category -eq $Category
-                        }
-
-                        if ($categorySnippets.Count -eq 0) {
-                            Write-Host "No snippets found in the '$Category' category."
+                switch ($menuChoice) {
+                    1 {
+                        $Category = Show-CategorySelectionMenu -CategorySelection $categorySelection
+                        if ($Category -eq "All Categories") {
+                            <# $allSnippets = @(
+                                (Load-Snippets -Path $usersnippetsPath),
+                                (Load-Snippets -Path $systemsnippetsPath)
+                            ) #>
+                            $allSnippets += (Load-Snippets -Path $usersnippetsPath)
+                            $allSnippets += (Load-Snippets -Path $systemsnippetsPath)
+                            
+                            Show-SnippetExecutionMenu -Snippets $allSnippets
                         }
                         else {
-                            Show-SnippetExecutionMenu -Snippets $categorySnippets
+<#                             $categorySnippets = @(
+                                (Load-Snippets -Path $usersnippetsPath | Where-Object { $_.Category -eq $Category }),
+                                (Load-Snippets -Path $systemsnippetsPath | Where-Object { $_.Category -eq $Category })
+                            ) #>
+                            $categorySnippets += (Load-Snippets -Path $usersnippetsPath | Where-Object { $_.Category -eq $Category })
+                            $categorySnippets += (Load-Snippets -Path $systemsnippetsPath | Where-Object { $_.Category -eq $Category })
+                            
+                            if ($categorySnippets.Count -eq 0) {
+                                Write-Host "No snippets found in the '$Category' category."
+                            }
+                            else {
+                                Show-SnippetExecutionMenu -Snippets $categorySnippets
+                            }
                         }
+                        break
                     }
-                    break
+                    2 {
+                        $searchKeywords = Read-Host "Enter search keywords to find snippets"
+                        Show-PAFSnippetMenu -SearchKeywords $searchKeywords -FrameworkPrefix $FrameworkPrefix
+                        break
+                    }
+                    3 {
+                        return 3
+                    }
+                    default {
+                        Write-Warning "Invalid menu choice. Please select a valid option."
+                    }
                 }
-                2 {
-                    $searchKeywords = Read-Host "Enter search keywords to find snippets"
-                    Show-PAFSnippetMenu -SearchKeywords $searchKeywords -FrameworkPrefix $FrameworkPrefix
-                    break
-                }
-                3 {
-                    return 3
-                }
-                default {
-                    Write-Warning "Invalid menu choice. Please select a valid option."
-                }
-            }
-        } while ($menuChoice -ne 3)
+            } while ($menuChoice -ne 3)
+        }
     }
     catch {
         Write-Error "An error occurred in Show-PAFSnippetMenu: $_"
@@ -635,16 +649,20 @@ function Show-SnippetExecutionMenu {
     do {
         Write-Host "Available Snippets:"
         for ($i = 0; $i -lt $Snippets.Count; $i++) {
-            Write-Output "$($i + 1). $($Snippets[$i].Name) - $($Snippets[$i].Synopsis)"
+            # wow! only write-host displays; write-output do not!
+            #Write-Output "$($i + 1). $($Snippets[$i].Name) - $($Snippets[$i].Synopsis)"
+            Write-Host "$($i + 1). $($Snippets[$i].Name) - $($Snippets[$i].Synopsis)"
         }
-
         Write-Host "X. Go back to the main menu"
         $menuChoice = Read-Host "Enter the number corresponding to the snippet to execute or 'X' to go back"
 
         if ($menuChoice -ge 1 -and $menuChoice -le $Snippets.Count) {
             $selectedSnippet = $Snippets[$menuChoice - 1]
-            Write-Host "Executing snippet: $($selectedSnippet.Name)"
-            Invoke-Expression $selectedSnippet.Path
+            Write-Host "Executing snippet: $($selectedSnippet.Name) '$($selectedSnippet.Path)'"
+            #return (Invoke-Expression $selectedSnippet.Path)
+            $snippetOutput = Invoke-Expression "& { . '$($selectedSnippet.Path)' }"
+            write-host ($snippetOutput | out-string)
+            
         }
         elseif ($menuChoice -eq "X" -or $menuChoice -eq "x") {
             return
@@ -654,7 +672,6 @@ function Show-SnippetExecutionMenu {
         }
     } while ($true)
 }
-
 
 # Gets name of category and function from snippet; must be definied by user in script
 function Get-PAFScriptBlockInfo {

@@ -23,11 +23,12 @@ Get-ProcessInfo
     )
 
     try {
-        if (-not $PSBoundParameters.ContainsKey('ProcessName')) {
-            Write-Host "'ProcessName' used default value: $ProcessName"
-        } else {
-            Write-Host "'ProcessName' explicitly provided: $ProcessName"
-        }
+        if (-not $PSBoundParameters.ContainsKey('ProcessName') -or $PSBoundParameters.ContainsKey('ProcessName') -eq "system") {
+            Write-Host "Info: default 'ProcessName' value: $ProcessName"
+        } 
+        #else {
+        #    Write-Host "'ProcessName' explicitly provided: $ProcessName"
+        #}
     
 
         $process = Get-Process -Name $ProcessName -ErrorAction Stop
@@ -52,7 +53,7 @@ Get-ProcessInfo
 }
 $process = (Read-Host -Prompt "Provide process name")
 if ($process) {
-    Get-ProcessInfo -ProcessName $process
+    (Get-ProcessInfo -ProcessName $process)
 } else {
     Get-ProcessInfo 
 }
