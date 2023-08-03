@@ -431,10 +431,15 @@ function Get-PAFSnippets {
                 @{l = "Description"; e = { $_.Description.Text } }, `
                 @{l = "Category"; e = { $category } }
 
+                $snippetDescription = ""
+                if ($null -ne $metadata.Description) {
+                    $snippetDescription = $metadata.Description.ToString()
+                } 
+
                 $snippetMetadata = [PSCustomObject]@{
                     'Name'        = $functionName
-                    'Synopsis'    = $metadata.Synopsis
-                    'Description' = $metadata.Description.ToString()
+                    'Synopsis'    = $metadata.Synopsis.trimEnd()
+                    'Description' = $snippetDescription
                     'Category'    = $metadata.Category.ToString()
                     'Path'        = $file.FullName
                 }
@@ -546,8 +551,8 @@ function Show-PAFSnippetMenu {
                 (Load-Snippets -Path $systemsnippetsPath | Select-Object -ExpandProperty Category -Unique)
             )
             #>
-            $categories += (Load-Snippets -Path $usersnippetsPath | Select-Object -ExpandProperty Category -Unique)
-            $categories += (Load-Snippets -Path $systemsnippetsPath | Select-Object -ExpandProperty Category -Unique)
+            [array]$categories += (Load-Snippets -Path $usersnippetsPath | Select-Object -ExpandProperty Category -Unique)
+            [array]$categories += (Load-Snippets -Path $systemsnippetsPath | Select-Object -ExpandProperty Category -Unique)
             
 
             if ($categories.Count -eq 0) {
