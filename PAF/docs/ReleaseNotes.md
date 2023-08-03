@@ -12,7 +12,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ### Changed
 
-- n/a
+- [#9](https://github.com/voytas75/PowershellFramework/issues/9)
 
 ## [0.2.2] - 2023.08.03
 
