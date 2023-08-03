@@ -582,6 +582,7 @@ function Show-PAFSnippetMenu {
                                 (Load-Snippets -Path $usersnippetsPath),
                                 (Load-Snippets -Path $systemsnippetsPath)
                             ) #>
+                            $allSnippets = @()
                             $allSnippets += (Load-Snippets -Path $usersnippetsPath)
                             $allSnippets += (Load-Snippets -Path $systemsnippetsPath)
                             
