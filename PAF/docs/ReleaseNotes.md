@@ -14,7 +14,9 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 - snippet template
 - deleted an unnecessary `snippets\user` folder
+- [#5](https://github.com/voytas75/PowershellFramework/issues/5)
 - [#7](https://github.com/voytas75/PowershellFramework/issues/7)
+- [#8](https://github.com/voytas75/PowershellFramework/issues/8)
 
 ## [0.2.1] - 2023.08.02
 

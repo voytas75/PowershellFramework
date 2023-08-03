@@ -12,7 +12,7 @@ This is a template file demonstrating how to prepare a function snippet for the 
 function Get-Example {
     <#
 :CATEGORY
-Put here the name of the category
+Example
 :NAME
 Get-Example
 #>
