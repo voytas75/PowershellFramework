@@ -459,6 +459,22 @@ function Get-PAFSnippets {
     }
 }
 
+# Define a helper function to load snippets from a given path
+function Load-Snippets {
+    param (
+        [string]$Path
+    )
+            
+    if (Test-Path -Path $Path) {
+        Get-PAFSnippets -SnippetsPath $Path -FrameworkPrefix $FrameworkPrefix
+    }
+    else {
+        Write-Warning "Invalid snippets path: $Path"
+        return @()
+    }
+}
+
+        
 # Improved Show-PAFSnippetMenu with better error handling and comments
 # Function to display the menu for executing selected snippets
 function Show-PAFSnippetMenu {
@@ -506,28 +522,14 @@ function Show-PAFSnippetMenu {
         $usersnippetsPath = (Get-PAFConfiguration).UserSnippetsPath
         $systemsnippetsPath = (Get-PAFConfiguration).SnippetsPath
 
-        # Define a helper function to load snippets from a given path
-        function Load-Snippets {
-            param (
-                [string]$Path
-            )
-            
-            if (Test-Path -Path $Path) {
-                Get-PAFSnippets -SnippetsPath $Path -FrameworkPrefix $FrameworkPrefix
-            }
-            else {
-                Write-Warning "Invalid snippets path: $Path"
-                return @()
-            }
-        }
-
         # Load snippets based on the search criteria or return all snippets
         if ($SearchKeywords) {
             <#             $allSnippets = @(
                 (Load-Snippets -Path $usersnippetsPath),
                 (Load-Snippets -Path $systemsnippetsPath)
             )
- #>            $allSnippets += (Load-Snippets -Path $usersnippetsPath)
+ #>            
+            $allSnippets += (Load-Snippets -Path $usersnippetsPath)
             $allSnippets += (Load-Snippets -Path $systemsnippetsPath)
             
 
@@ -551,8 +553,9 @@ function Show-PAFSnippetMenu {
                 (Load-Snippets -Path $systemsnippetsPath | Select-Object -ExpandProperty Category -Unique)
             )
             #>
-            [array]$categories += (Load-Snippets -Path $usersnippetsPath | Select-Object -ExpandProperty Category -Unique)
-            [array]$categories += (Load-Snippets -Path $systemsnippetsPath | Select-Object -ExpandProperty Category -Unique)
+            $categories = @()
+            $categories += (Load-Snippets -Path $usersnippetsPath | Select-Object -ExpandProperty Category -Unique)
+            $categories += (Load-Snippets -Path $systemsnippetsPath | Select-Object -ExpandProperty Category -Unique)
             
 
             if ($categories.Count -eq 0) {
@@ -585,10 +588,11 @@ function Show-PAFSnippetMenu {
                             Show-SnippetExecutionMenu -Snippets $allSnippets
                         }
                         else {
-<#                             $categorySnippets = @(
+                            <#                             $categorySnippets = @(
                                 (Load-Snippets -Path $usersnippetsPath | Where-Object { $_.Category -eq $Category }),
                                 (Load-Snippets -Path $systemsnippetsPath | Where-Object { $_.Category -eq $Category })
                             ) #>
+                            $categorySnippets = @()
                             $categorySnippets += (Load-Snippets -Path $usersnippetsPath | Where-Object { $_.Category -eq $Category })
                             $categorySnippets += (Load-Snippets -Path $systemsnippetsPath | Where-Object { $_.Category -eq $Category })
                             
