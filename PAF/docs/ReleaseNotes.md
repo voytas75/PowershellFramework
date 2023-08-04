@@ -4,16 +4,17 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/) and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## [0.2.3] - 2023.08.03
+## [0.2.3] - 2023.08.04
 
 ### Added
 
-- improve performance
+- improve performance.
+- snippet function output margins.
 
 ### Changed
 
-- [#9](https://github.com/voytas75/PowershellFramework/issues/9)
-- [#8](https://github.com/voytas75/PowershellFramework/issues/8)
+- [#9](https://github.com/voytas75/PowershellFramework/issues/9).
+- [#8](https://github.com/voytas75/PowershellFramework/issues/8).
 
 ## [0.2.2] - 2023.08.03
 
