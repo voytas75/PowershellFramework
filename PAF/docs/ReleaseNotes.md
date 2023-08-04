@@ -12,7 +12,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ### Changed
 
-- n/a
+- tls line.
 
 ## [0.2.3] - 2023.08.04
 
