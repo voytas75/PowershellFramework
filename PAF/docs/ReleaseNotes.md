@@ -10,6 +10,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 - improve performance.
 - snippet function output margins and captions.
+- example snippet functions in `snippets\core`
 
 ### Changed
 

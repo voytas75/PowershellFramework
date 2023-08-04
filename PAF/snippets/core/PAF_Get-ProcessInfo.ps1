@@ -6,6 +6,10 @@ Get processes info.
 .DESCRIPTION
 
 This script retrieves basic process information. Default process is 'system'
+
+.LINK
+https://github.com/voytas75/PowershellFramework
+The GitHub repository for the PowerShell Awesome Framework.
 #>
 
 

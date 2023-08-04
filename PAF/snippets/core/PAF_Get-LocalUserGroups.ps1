@@ -5,6 +5,9 @@ Get a list of groups a specified local user is a member of.
 .DESCRIPTION
 This function retrieves a list of groups a specified local user is a member of on the local computer.
 
+.LINK
+https://github.com/voytas75/PowershellFramework
+The GitHub repository for the PowerShell Awesome Framework.
 #>
 
 

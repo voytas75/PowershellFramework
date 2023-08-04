@@ -5,6 +5,9 @@ Get the status of a specified service on the local computer.
 .DESCRIPTION
 This function retrieves the current status (running, stopped, etc.) of a specified service on the local computer.
 
+.LINK
+https://github.com/voytas75/PowershellFramework
+The GitHub repository for the PowerShell Awesome Framework.
 #>
 
 

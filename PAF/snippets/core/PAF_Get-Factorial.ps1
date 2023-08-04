@@ -4,6 +4,10 @@ Calculate the factorial of a given number.
 
 .DESCRIPTION
 This function calculates the factorial of a positive integer.
+
+.LINK
+https://github.com/voytas75/PowershellFramework
+The GitHub repository for the PowerShell Awesome Framework.
 #>
 
 

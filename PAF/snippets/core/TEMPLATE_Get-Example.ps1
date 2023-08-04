@@ -6,6 +6,10 @@ shor description. it is shown in menu.
 .DESCRIPTION
 
 long description
+
+.LINK
+https://github.com/voytas75/PowershellFramework
+The GitHub repository for the PowerShell Awesome Framework.
 #>
 
 

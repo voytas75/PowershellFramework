@@ -5,6 +5,9 @@ Get information about the memory (RAM) on the local computer.
 .DESCRIPTION
 This function retrieves detailed information about the memory (RAM) on the local computer, such as total physical memory and available memory.
 
+.LINK
+https://github.com/voytas75/PowershellFramework
+The GitHub repository for the PowerShell Awesome Framework.
 #>
 
 

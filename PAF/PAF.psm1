@@ -44,6 +44,10 @@ function Write-ErrorLog {
     Write-ErrorLog "Failed to connect to the server." -LogFilePrefix "MyApp"
 
     Display the error message on the console and log it to "MyApp_error.log" in the user-specific temporary directory.
+
+    .LINK
+    https://github.com/voytas75/PowershellFramework
+    The GitHub repository for the PowerShell Awesome Framework.
     #>
 
     [CmdletBinding()]
@@ -146,7 +150,7 @@ function Get-PAFConfiguration {
     try {
         # If ConfigFilePath is not specified, use the default path (same directory as the script)
         if (-not $ConfigFilePath) {
-            $ConfigFilePath = Join-Path $PSScriptRoot 'config.json'
+            $ConfigFilePath = Join-Path $PSScriptRoot 'config\config.json'
         }
 
         # Check if the configuration file exists
@@ -306,6 +310,10 @@ function Save-PAFConfiguration {
     .EXAMPLE
     Save-PAFConfiguration -ConfigData $customConfigData -ConfigFilePath "C:\Path\to\config.json"
     Save the custom configuration data to the specified file path.
+
+    .LINK
+    https://github.com/voytas75/PowershellFramework
+    The GitHub repository for the PowerShell Awesome Framework.
     #>
 
     [CmdletBinding()]
@@ -804,7 +812,6 @@ The PAF will keep running until the user decides to exit manually.
 .LINK
 https://github.com/voytas75/PowershellFramework
 The GitHub repository for the PowerShell Awesome Framework.
-
 #>
     try {
         $configData = Get-PAFConfiguration

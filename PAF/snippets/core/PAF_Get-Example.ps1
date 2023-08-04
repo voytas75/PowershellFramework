@@ -6,6 +6,10 @@ Template
 .DESCRIPTION
 
 This is a template file demonstrating how to prepare a function snippet for the PowerShell Awesome Module.
+
+.LINK
+https://github.com/voytas75/PowershellFramework
+The GitHub repository for the PowerShell Awesome Framework.
 #>
 
 

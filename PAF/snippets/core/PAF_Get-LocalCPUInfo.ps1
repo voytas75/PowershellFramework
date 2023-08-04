@@ -5,6 +5,9 @@ Get information about the CPU on the local computer.
 .DESCRIPTION
 This function retrieves detailed information about the CPU on the local computer, such as the number of cores and the processor name.
 
+.LINK
+https://github.com/voytas75/PowershellFramework
+The GitHub repository for the PowerShell Awesome Framework.
 #>
 
 

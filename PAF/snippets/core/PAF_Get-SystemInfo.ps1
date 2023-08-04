@@ -4,6 +4,10 @@ This snippet retrieves basic system information such as OS version, computer nam
 
 .Description
 This script demonstrates how to retrieve basic system information using WMI and CIM cmdlets.
+
+.LINK
+https://github.com/voytas75/PowershellFramework
+The GitHub repository for the PowerShell Awesome Framework.
 #>
 
 
