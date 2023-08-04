@@ -9,7 +9,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 ### Added
 
 - improve performance.
-- snippet function output margins.
+- snippet function output margins and captions.
 
 ### Changed
 

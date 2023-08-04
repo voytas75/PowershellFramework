@@ -676,10 +676,13 @@ function Show-SnippetExecutionMenu {
 
         if ($menuChoice -ge 1 -and $menuChoice -le $Snippets.Count) {
             $selectedSnippet = $Snippets[$menuChoice - 1]
-            Write-Host "Executing snippet: $($selectedSnippet.Name) '$($selectedSnippet.Path)'"
+            Clear-Host
+            Write-Host "Executing snippet: $($selectedSnippet.Name)`nPath: '$($selectedSnippet.Path)'`nDescription: '$($selectedSnippet.Description)'`n" -ForegroundColor DarkGreen
+            Write-Host "Start of snippet`n`n" -ForegroundColor DarkBlue
             #return (Invoke-Expression $selectedSnippet.Path)
-            $snippetOutput = Invoke-Expression "& { . '$($selectedSnippet.Path)' }"
+            Invoke-Expression "& { . '$($selectedSnippet.Path)' }" -OutVariable snippetOutput
             write-host ($snippetOutput | out-string)
+            Write-Host "`nEnd of snippet`n" -ForegroundColor DarkBlue
             
         }
         elseif ($menuChoice -eq "X" -or $menuChoice -eq "x") {
