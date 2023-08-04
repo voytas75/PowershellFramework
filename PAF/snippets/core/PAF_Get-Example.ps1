@@ -26,7 +26,9 @@ Get-Example
     # Here goes the code for the function snippet
     return @"
 To prepare a function snippet for PAF, you must follow these steps:
-1. Add a prefix to the name of the snippet file (e.g., 'PAF_Get-Example.ps1').
+1. Add a prefix to the name of the snippet file (e.g., 'PAF_Get-Example.ps1'). Look at tempate files:
+    - '${PSScriptRoot}\PAF_Get-Example.ps1'
+    - '${PSScriptRoot}\TEMPLATE_Get-Example.ps1' 
 2. Add inline help at the top of the file, and leave two empty lines after it:
 <#
 .SYNOPSIS
