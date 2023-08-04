@@ -10,7 +10,7 @@ This script demonstrates how to retrieve basic system information using WMI and 
 function Get-SystemInfo {
 <#
 :CATEGORY
-utility
+System Information
 :NAME
 Get-SystemInfo
 #>

@@ -28,7 +28,7 @@ function Get-Factorial {
             for ($i = 1; $i -le $Number; $i++) {
                 $result *= $i
             }
-            $result
+            Write-Host "Factorial of $number is $result"
         }
         else {
             throw "Factorial is only defined for positive integers greater than 1."
@@ -37,5 +37,6 @@ function Get-Factorial {
 }
     
 # The snippet must have code to run the function(s) when invoked by PAF.
-Get-Factorial -Number 5
+$number = Read-Host -Prompt "Provide number to factorial"
+Get-Factorial -Number $number
     
