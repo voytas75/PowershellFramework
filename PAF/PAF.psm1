@@ -528,10 +528,14 @@ function Show-PAFSnippetMenu {
                 (Load-Snippets -Path $usersnippetsPath),
                 (Load-Snippets -Path $systemsnippetsPath)
             )
- #>            
-            $allSnippets += (Load-Snippets -Path $usersnippetsPath)
-            $allSnippets += (Load-Snippets -Path $systemsnippetsPath)
-            
+ #>         
+            if ($script:cachedSnippets.Length -gt 0) {
+                $allSnippets = $script:cachedSnippets
+            }
+            else {
+                $allSnippets += (Load-Snippets -Path $usersnippetsPath)
+                $allSnippets += (Load-Snippets -Path $systemsnippetsPath)
+            }
 
             $matchedSnippets = $allSnippets | Where-Object {
                 $_.Name -like "*$SearchKeywords*" -or $_.Synopsis -like "*$SearchKeywords*" -or $_.Description -like "*$SearchKeywords*"
@@ -554,9 +558,13 @@ function Show-PAFSnippetMenu {
             )
             #>
             $categories = @()
-            $categories += (Load-Snippets -Path $usersnippetsPath | Select-Object -ExpandProperty Category -Unique)
-            $categories += (Load-Snippets -Path $systemsnippetsPath | Select-Object -ExpandProperty Category -Unique)
-            
+            if ($script:cachedSnippets.Length -gt 0) {
+                $categories = ($script:cachedSnippets | Select-Object -ExpandProperty Category -Unique)
+            }
+            else {
+                $categories += (Load-Snippets -Path $usersnippetsPath | Select-Object -ExpandProperty Category -Unique)
+                $categories += (Load-Snippets -Path $systemsnippetsPath | Select-Object -ExpandProperty Category -Unique)
+            }            
 
             if ($categories.Count -eq 0) {
                 Write-Host "No categories found. Continuing without category selection."
