@@ -863,8 +863,7 @@ function Get-Banner {
 $oldProtocol = [Net.ServicePointManager]::SecurityProtocol
 
 # Switch to using TLS 1.2
-[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
-
+[Net.ServicePointManager]::SecurityProtocol = [Net.ServicePointManager]::SecurityProtocol -bor [Net.SecurityProtocolType]::Tls12
 # Get the name of the current module
 $ModuleName = "PAF"
 
@@ -888,7 +887,7 @@ catch {
 }
 
 # Restore the original TLS security protocol
-[Net.ServicePointManager]::SecurityProtocol = $oldProtocol
+#[Net.ServicePointManager]::SecurityProtocol = $oldProtocol
 
 # Create fingerprint
 #..\helpers\moduleFingerprint.ps1
