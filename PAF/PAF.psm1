@@ -153,6 +153,14 @@ function Get-PAFConfiguration {
             $ConfigFilePath = Join-Path $PSScriptRoot 'config\config.json'
         }
 
+        # Check if the configuration folder exists
+        if (-not (Test-Path (Join-Path $PSScriptRoot 'config'))) {
+            # Create the configuration file with default values
+            [void](New-Item -Path (Join-Path $PSScriptRoot 'config') -ItemType Directory)
+            Write-Host "Configuration folder created at '$(Join-Path $PSScriptRoot 'config')'."
+        }
+
+
         # Check if the configuration file exists
         if (-not (Test-Path $ConfigFilePath)) {
             # Create the configuration file with default values
