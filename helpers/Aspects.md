@@ -39,12 +39,17 @@ Features', capabilities', functionalities' and options' ideas
     - Function Execution Profiling Process:
 
     *Enable Profiling*: Users can enable profiling for specific functions or categories via a command or configuration setting.
+
     *Capture Metrics*: When a function is executed with profiling enabled, the module will capture metrics like execution time, memory usage, and CPU utilization.
+
     *Display Profiling Data*: Users can view the profiling data through a dedicated command or within the existing menu. The data will be presented in a clear and user-friendly format.
 
     *File Format*: The Function Importer will only support importing functions from `.ps1` script files.
+
     *Import from Module Menu*: Users will have an option in the module menu to import functions from `.ps1` files. When selecting this option, they can provide the path to the desired `.ps1` file.
+
     *Handling Conflicting Function Names*: If there is a conflict with the imported function's name, users will have the choice to either overwrite the existing function with the imported one or rename the imported function to avoid conflicts.
+
     *Versioning*: By default, the Function Importer will assume the imported function is the latest version. If versioning is required, users can manually manage versioning within the PAF module.
 
 17. Function Export and Import." This functionality will enable users to export their custom functions to files for sharing and backup purposes. It will also allow users to import functions from files or online repositories, expanding the library of available functions and promoting community collaboration.
@@ -87,6 +92,7 @@ Features', capabilities', functionalities' and options' ideas
     The "Built-in analytics and insights" feature empowers users of the PowerShell Awesome Framework - PAF with a comprehensive analytics and data visualization system. This system collects, analyzes, and presents data related to the usage of the framework, function performance, and user interactions. By providing actionable insights and visualizations, users can make informed decisions to optimize their functions and overall framework usage.
 
     *Benefits for Users*:
+
     1. Performance Optimization: Users can identify performance bottlenecks and resource-intensive functions through performance metrics. This helps them optimize their functions for better efficiency and resource utilization.
     2. Usage Trends: The analytics system tracks and presents usage trends, showing which functions are most frequently executed and which features are popular among users. This helps users prioritize improvements and focus on popular functions.
     3. Error Analysis: Users can access detailed error logs and analysis to troubleshoot issues with their functions effectively. This enables quicker resolution of problems and enhances the overall reliability of the framework.
