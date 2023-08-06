@@ -27,9 +27,8 @@
 
 11. **User feedback** and bug reporting mechanism.
 12. **Interactive tutorial** mode to assist beginners in using the module.
-13. Module's logging and error handling capabilities. Users may want to track the execution of their functions and identify any issues.
-14. User feedback system for suggestions and issue reporting.
-15. Comprehensive and user-friendly documentation with examples.
+13. **Module's logging** and error handling capabilities. Users may want to track the execution of their functions and identify any issues.
+14. **Comprehensive and user-friendly documentation with examples.**
 
 ## Others
 
@@ -105,12 +104,13 @@
     5. Data-Driven Decisions: With data-backed insights, users can make informed decisions about their function development, updates, and overall framework usage. This ensures that their efforts align with actual user needs and preferences.
 
     *Examples*:
-    6. Function Usage Dashboard: The analytics system provides a dashboard that displays the frequency of function executions, function categories with the most activity, and user engagement metrics. Users can quickly visualize which functions are being used most often and their popularity over time.
-    7. Performance Metrics: Users can access performance metrics for their functions, including execution time, memory usage, and CPU usage. By analyzing these metrics, they can identify performance bottlenecks and optimize their functions for better efficiency.
-    8. Error Analysis and Logs: The system logs and categorizes errors encountered during function execution. Users can view detailed error reports, stack traces, and recommendations to troubleshoot and resolve issues effectively.
-    9. Function Adoption Tracker: Users can see how quickly their newly added functions gain adoption within the framework. This helps them gauge the success of their contributions and encourages further improvements.
-    10. User Engagement Metrics: The analytics system tracks user interactions within the framework, such as the most active users, frequently used functions, and user feedback. This information enables users to understand how their functions are being received and make enhancements based on user feedback.
-    11. Recommendations and Suggestions: Based on user behavior and framework usage patterns, the system can provide personalized recommendations for related functions, similar modules, or complementary features that users might find useful.
+
+    1. Function Usage Dashboard: The analytics system provides a dashboard that displays the frequency of function executions, function categories with the most activity, and user engagement metrics. Users can quickly visualize which functions are being used most often and their popularity over time.
+    2. Performance Metrics: Users can access performance metrics for their functions, including execution time, memory usage, and CPU usage. By analyzing these metrics, they can identify performance bottlenecks and optimize their functions for better efficiency.
+    3. Error Analysis and Logs: The system logs and categorizes errors encountered during function execution. Users can view detailed error reports, stack traces, and recommendations to troubleshoot and resolve issues effectively.
+    4. Function Adoption Tracker: Users can see how quickly their newly added functions gain adoption within the framework. This helps them gauge the success of their contributions and encourages further improvements.
+    5. User Engagement Metrics: The analytics system tracks user interactions within the framework, such as the most active users, frequently used functions, and user feedback. This information enables users to understand how their functions are being received and make enhancements based on user feedback.
+    6. Recommendations and Suggestions: Based on user behavior and framework usage patterns, the system can provide personalized recommendations for related functions, similar modules, or complementary features that users might find useful.
 
     With the "Built-in analytics and insights" aspect, users gain valuable visibility into their function usage, performance, and user interactions. This empowers them to make data-driven decisions, optimize their functions, and continuously improve the PowerShell Awesome Framework - PAF.
 
