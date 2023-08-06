@@ -28,6 +28,7 @@ Features', capabilities', functionalities' and options' ideas
 14. Configuration Wizard: Implement a guided configuration wizard that helps users set up the module easily by specifying the configurable path and other settings.
 15. Function Execution History: Track and display the execution history of user functions, allowing users to review past runs and results.
 16. Function Execution Profiling
+
     **Description**: Implement a function execution profiling feature that allows users to analyze the performance of their functions. This profiling feature will capture and display metrics such as execution time, memory usage, and CPU utilization for each function run.
 
     Benefits:
@@ -52,6 +53,7 @@ Features', capabilities', functionalities' and options' ideas
 20. Debugging Mode: Include an option for users to enable a debugging mode that provides detailed logs and error messages for troubleshooting.
 21. Function Exclusion: Allow users to specify functions they want to exclude from the automated discovery process.
 22. User Function Templates.
+
     Let's expand on the idea of "User Function Templates" for the Powershell Awesome Framework (PAF). User Function Templates would provide users with predefined structures for creating specific types of functions, streamlining the process of writing new functions for common tasks. Here's how it could work:
 
     1. **Template Library**: The PAF would include a library of predefined templates, covering a range of common use cases, such as file manipulation, network operations, data processing, etc.
@@ -80,17 +82,18 @@ Features', capabilities', functionalities' and options' ideas
 24. User feedback system for suggestions and issue reporting.
 25. Comprehensive and user-friendly documentation with examples.
 26. Built-in analytics and insights for data-driven decisions.
-    Description:
+
+    **Description**:
     The "Built-in analytics and insights" feature empowers users of the PowerShell Awesome Framework - PAF with a comprehensive analytics and data visualization system. This system collects, analyzes, and presents data related to the usage of the framework, function performance, and user interactions. By providing actionable insights and visualizations, users can make informed decisions to optimize their functions and overall framework usage.
 
-    Benefits for Users:
+    *Benefits for Users*:
     1. Performance Optimization: Users can identify performance bottlenecks and resource-intensive functions through performance metrics. This helps them optimize their functions for better efficiency and resource utilization.
     2. Usage Trends: The analytics system tracks and presents usage trends, showing which functions are most frequently executed and which features are popular among users. This helps users prioritize improvements and focus on popular functions.
     3. Error Analysis: Users can access detailed error logs and analysis to troubleshoot issues with their functions effectively. This enables quicker resolution of problems and enhances the overall reliability of the framework.
     4. Function Adoption: By monitoring the adoption rates of different functions, users can identify which functions gain traction quickly and which ones may need further improvements or promotion.
     5. Data-Driven Decisions: With data-backed insights, users can make informed decisions about their function development, updates, and overall framework usage. This ensures that their efforts align with actual user needs and preferences.
 
-    Examples:
+    *Examples*:
     1. Function Usage Dashboard: The analytics system provides a dashboard that displays the frequency of function executions, function categories with the most activity, and user engagement metrics. Users can quickly visualize which functions are being used most often and their popularity over time.
     2. Performance Metrics: Users can access performance metrics for their functions, including execution time, memory usage, and CPU usage. By analyzing these metrics, they can identify performance bottlenecks and optimize their functions for better efficiency.
     3. Error Analysis and Logs: The system logs and categorizes errors encountered during function execution. Users can view detailed error reports, stack traces, and recommendations to troubleshoot and resolve issues effectively.
