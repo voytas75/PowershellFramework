@@ -94,6 +94,7 @@ Features', capabilities', functionalities' and options' ideas
     5. Data-Driven Decisions: With data-backed insights, users can make informed decisions about their function development, updates, and overall framework usage. This ensures that their efforts align with actual user needs and preferences.
 
     *Examples*:
+
     1. Function Usage Dashboard: The analytics system provides a dashboard that displays the frequency of function executions, function categories with the most activity, and user engagement metrics. Users can quickly visualize which functions are being used most often and their popularity over time.
     2. Performance Metrics: Users can access performance metrics for their functions, including execution time, memory usage, and CPU usage. By analyzing these metrics, they can identify performance bottlenecks and optimize their functions for better efficiency.
     3. Error Analysis and Logs: The system logs and categorizes errors encountered during function execution. Users can view detailed error reports, stack traces, and recommendations to troubleshoot and resolve issues effectively.
