@@ -16,7 +16,7 @@ The GitHub repository for the PowerShell Awesome Framework.
 function Get-ProcessInfo {
 <#
 :CATEGORY
-System Information
+Example
 :NAME
 Get-ProcessInfo
 #>

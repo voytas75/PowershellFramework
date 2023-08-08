@@ -14,7 +14,7 @@ The GitHub repository for the PowerShell Awesome Framework.
 function Get-RecentFiles {
     <#
     :CATEGORY
-    Files
+    Example
     :NAME
     Get-RecentFiles
     #>
