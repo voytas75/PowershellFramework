@@ -120,6 +120,10 @@ To prepare a function snippet for adding it to the PowerShell Awesome Module use
 
 By following these steps, you can contribute function snippets to the PowerShell Awesome Module effectively. Ensure that your snippets adhere to the guidelines mentioned above for consistency and compatibility with the module.
 
+## Aspects' ideas
+
+[Aspects' ideas](./helpers/Aspects.md)
+
 ## Versioning
 
 We use [SemVer](http://semver.org/) for versioning.
