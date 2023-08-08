@@ -14,7 +14,7 @@ The GitHub repository for the PowerShell Awesome Framework.
 function Get-LocalCPUInfo {
     <#
     :CATEGORY
-    System Information
+    Example
     :NAME
     Get-LocalCPUInfo
     #>

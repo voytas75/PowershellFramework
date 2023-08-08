@@ -14,7 +14,7 @@ The GitHub repository for the PowerShell Awesome Framework.
 function Get-LocalServiceStatus {
     <#
     :CATEGORY
-    System Information
+    Example
     :NAME
     Get-LocalServiceStatus
     #>

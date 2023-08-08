@@ -14,7 +14,7 @@ The GitHub repository for the PowerShell Awesome Framework.
 function Get-Factorial {
     <#
     :CATEGORY
-    Math
+    Example
 
     :NAME
     Get-Factorial

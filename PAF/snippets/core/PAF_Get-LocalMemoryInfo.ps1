@@ -14,7 +14,7 @@ The GitHub repository for the PowerShell Awesome Framework.
 function Get-LocalMemoryInfo {
     <#
     :CATEGORY
-    System Information
+    Example
     :NAME
     Get-LocalMemoryInfo
     #>

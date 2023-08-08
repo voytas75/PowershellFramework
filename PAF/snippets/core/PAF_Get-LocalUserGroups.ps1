@@ -14,7 +14,7 @@ The GitHub repository for the PowerShell Awesome Framework.
 function Get-LocalUserGroups {
     <#
     :CATEGORY
-    User Management
+    Example
     :NAME
     Get-LocalUserGroups
     #>
