@@ -12,20 +12,29 @@ The GitHub repository for the PowerShell Awesome Framework.
 
 
 function Get-SystemInfo {
-<#
+    <#
 :CATEGORY
 System Information
 :NAME
 Get-SystemInfo
 #>
-$osVersion = Get-WmiObject -Class Win32_OperatingSystem | Select-Object -ExpandProperty Caption
-    $computerName = $env:COMPUTERNAME
-    $totalRAM = (Get-CimInstance -ClassName Win32_ComputerSystem | Select-Object -ExpandProperty TotalPhysicalMemory) / 1GB
 
+    # Check if PowerShell version is 7 or higher
+    $psVersion = $PSVersionTable.PSVersion
+    if ($psVersion.Major -ge 7) {
+        $osVersion = Get-CimInstance -ClassName Win32_OperatingSystem | Select-Object -ExpandProperty Caption
+        $computerName = $env:COMPUTERNAME
+        $totalRAM = (Get-CimInstance -ClassName Win32_ComputerSystem | Select-Object -ExpandProperty TotalPhysicalMemory) / 1GB
+    }
+    else { # Check if PowerShell version is < 7
+        $osVersion = Get-WmiObject -Class Win32_OperatingSystem | Select-Object -ExpandProperty Caption
+        $computerName = $env:COMPUTERNAME
+        $totalRAM = (Get-WmiObject -Class Win32_ComputerSystem | Select-Object -ExpandProperty TotalPhysicalMemory) / 1GB
+    }
     $systemInfo = @{
-        OSVersion = $osVersion
+        OSVersion    = $osVersion
         ComputerName = $computerName
-        TotalRAM_GB = $totalRAM
+        TotalRAM_GB  = $totalRAM
     }
 
     return $systemInfo
