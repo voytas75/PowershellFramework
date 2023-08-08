@@ -134,6 +134,7 @@ function Get-PAFConfiguration {
     - MaxSnippetsPerPage: The maximum number of snippets displayed per page in the snippet menu.
     - ShowBannerOnStartup: A boolean value indicating whether to show the PAF banner on startup.
     - FrameworkPrefix: The prefix used to identify PAF-specific snippets.
+    - ShowExampleSnippet: A boolean value indicating whether showing the example snippet.
 
     To customize the configuration, manually edit the values in the config.json file using a text editor.
 
@@ -173,7 +174,7 @@ function Get-PAFConfiguration {
         $ConfigData = Get-Content -Path $ConfigFilePath -Raw | ConvertFrom-Json
 
         # Check if all required properties are present in the configuration data
-        $requiredProperties = @("FrameworkName", "DefaultModulePath", "SnippetsPath", "UserSnippetsPath", "MaxSnippetsPerPage", "ShowBannerOnStartup", "FrameworkPrefix")
+        $requiredProperties = @("FrameworkName", "DefaultModulePath", "SnippetsPath", "UserSnippetsPath", "MaxSnippetsPerPage", "ShowBannerOnStartup", "FrameworkPrefix", "ShowExampleSnippets")
         if (-not (Test-RequiredProperty -Object $ConfigData -Property $requiredProperties)) {
             Write-Warning "Invalid configuration file structure. Missing required properties. Using default values."
             return Get-PAFDefaultConfiguration
@@ -252,7 +253,8 @@ function Get-PAFDefaultConfiguration {
     - MaxSnippetsPerPage: The maximum number of snippets displayed per page in the snippet menu.
     - ShowBannerOnStartup: A boolean value indicating whether to show the PAF banner on startup.
     - FrameworkPrefix: The prefix used to identify PAF-specific snippets.
-
+    - ShowExampleSnippets: A boolean value indicating whether to show the example snippets.
+    
     Additional configuration options can be added to the hashtable as needed.
 
     .LINK
@@ -277,6 +279,7 @@ function Get-PAFDefaultConfiguration {
         "MaxSnippetsPerPage"  = 10
         "ShowBannerOnStartup" = $true
         "FrameworkPrefix"     = "PAF"
+        "ShowExampleSnippets" = $true
         # Add more configuration options here with their default values
         # For example:
         # "Theme"               = "Dark"
@@ -688,9 +691,9 @@ function Show-SnippetExecutionMenu {
             Write-Host "$($i + 1). $($Snippets[$i].Name) - $($Snippets[$i].Synopsis)"
         }
         Write-Host "X. Go back to the main menu"
-        $menuChoice = Read-Host "Enter the number corresponding to the snippet to execute or 'X' to go back"
+        [int]$menuChoice = Read-Host "Enter the number corresponding to the snippet to execute or 'X' to go back"
 
-        if ($menuChoice -ge 1 -and $menuChoice -le $Snippets.Count) {
+        if ($menuChoice -ge 1 -and ($menuChoice -le $($Snippets.Count))) {
             $selectedSnippet = $Snippets[$menuChoice - 1]
             Clear-Host
             Write-Host "Executing snippet: $($selectedSnippet.Name)`nPath: '$($selectedSnippet.Path)'`nDescription: '$($selectedSnippet.Description)'`n" -ForegroundColor DarkGreen
