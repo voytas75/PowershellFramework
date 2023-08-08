@@ -194,23 +194,33 @@ function Get-PAFConfiguration {
 }
 
 # Function to test if required properties are present in an object
-function Test-RequiredProperty {
+function Test-PAFRequiredProperty {
     param (
         [Parameter(Mandatory = $true, ValueFromPipeline = $true)]
         [object]$Object,
 
-        [Parameter(Mandatory = $true)]
-        [string[]]$Property
+        [Parameter(Mandatory = $false)]
+        [string[]]$Property,
+
+        [string]$Setting
     )
 
     process {
-        foreach ($prop in $Property) {
-            if (-not $Object.PSObject.Properties.Name.Contains($prop)) {
-                Write-Error "Required property '$prop' not found in the object."
+        if ($null -eq $Setting) {
+            foreach ($prop in $Property) {
+                if (-not $Object.PSObject.Properties.Name.Contains($prop)) {
+                    Write-Error "Required property '$prop' not found in the object."
+                    return $false
+                }
+            }
+    
+        }
+        else {
+            if (-not $Object.PSObject.Properties.Name.Contains($Setting)) {
+                Write-Error "Required property '$Setting' not found in the object."
                 return $false
             }
         }
-
         return $true
     }
 }
@@ -354,7 +364,7 @@ function Save-PAFConfiguration {
         }
 
         if (-not $configFilePath) {
-            $configFilePath = "${PSScriptRoot}\config.json"
+            $configFilePath = "${PSScriptRoot}\config\config.json"
         }
 
         if (-not $configData) {
@@ -389,7 +399,7 @@ function Save-PAFConfiguration {
             }
             elseif ($null -ne $settingValue) {
                 # Update the value of the setting in the configuration data
-                $configData.$settingName = $settingValue
+                $configData | Add-Member -MemberType NoteProperty -Name $settingName -Value $settingValue
     
                 # Save the entire updated configuration data to the configuration file
                 $jsonConfig = $configData | ConvertTo-Json -Depth 10
@@ -402,6 +412,8 @@ function Save-PAFConfiguration {
             }
             else {
                 Write-Error "Setting '$settingName' not found in the configuration data."
+                return Get-PAFDefaultConfiguration
+
             }
     
         }
@@ -849,13 +861,12 @@ The GitHub repository for the PowerShell Awesome Framework.
         #$requiredProperties = @("FrameworkName", "DefaultModulePath", "SnippetsPath", "UserSnippetsPath", "MaxSnippetsPerPage", "ShowBannerOnStartup", "FrameworkPrefix", "ShowExampleSnippets")
         $requiredProperties = [array]($configdataDefault.Keys)
 
-        foreach ($configDataItem in $configdataDefault) {
+        foreach ($configDataItem in $requiredProperties) {
             # if no key in config then add it with default value
             # Check if all required properties are present in the configuration data
-            if (-not (Test-RequiredProperty -Object $ConfigData -Property $requiredProperties)) {
+            if (-not (Test-PAFRequiredProperty -Object $ConfigData -Setting $configDataItem )) {
                 Write-Warning "Invalid configuration file structure. Missing required properties. Using default values."
                 Save-PAFConfiguration -settingName $configDataItem -settingValue $configdataDefault[$configDataItem]
-                return Get-PAFDefaultConfiguration
             }
 
         }
