@@ -19,6 +19,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - [#19](https://github.com/voytas75/PowershellFramework/issues/19)
 - fix for `ShowExampleSnippets` type in config
 - fix the order of loading config
+- fix snippets' cache
 
 ## [0.2.4] - 2023.08.05
 
