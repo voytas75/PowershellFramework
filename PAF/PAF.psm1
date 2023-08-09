@@ -173,13 +173,6 @@ function Get-PAFConfiguration {
         # Read the content of the configuration file and convert it to a JSON object
         $ConfigData = Get-Content -Path $ConfigFilePath -Raw | ConvertFrom-Json
 
-        # Check if all required properties are present in the configuration data
-        $requiredProperties = @("FrameworkName", "DefaultModulePath", "SnippetsPath", "UserSnippetsPath", "MaxSnippetsPerPage", "ShowBannerOnStartup", "FrameworkPrefix", "ShowExampleSnippets")
-        if (-not (Test-RequiredProperty -Object $ConfigData -Property $requiredProperties)) {
-            Write-Warning "Invalid configuration file structure. Missing required properties. Using default values."
-            return Get-PAFDefaultConfiguration
-        }
-
         # Add the ConfigPath property to the object
         #$ConfigData | Add-Member -NotePropertyName "ConfigPath" -NotePropertyValue $ConfigFilePath
         # Check if the function was invoked from a script or directly from the console
@@ -201,23 +194,33 @@ function Get-PAFConfiguration {
 }
 
 # Function to test if required properties are present in an object
-function Test-RequiredProperty {
+function Test-PAFRequiredProperty {
     param (
         [Parameter(Mandatory = $true, ValueFromPipeline = $true)]
         [object]$Object,
 
-        [Parameter(Mandatory = $true)]
-        [string[]]$Property
+        [Parameter(Mandatory = $false)]
+        [string[]]$Property,
+
+        [string]$Setting
     )
 
     process {
-        foreach ($prop in $Property) {
-            if (-not $Object.PSObject.Properties.Name.Contains($prop)) {
-                Write-Error "Required property '$prop' not found in the object."
+        if ($null -eq $Setting) {
+            foreach ($prop in $Property) {
+                if (-not $Object.PSObject.Properties.Name.Contains($prop)) {
+                    #Write-Error "Required property '$prop' not found in the object."
+                    return $false
+                }
+            }
+    
+        }
+        else {
+            if (-not $Object.PSObject.Properties.Name.Contains($Setting)) {
+                #Write-Error "Required property '$Setting' not found in the object."
                 return $false
             }
         }
-
         return $true
     }
 }
@@ -307,6 +310,9 @@ function Save-PAFConfiguration {
     .PARAMETER SettingName
     The name of the individual setting to save. If provided, the function will update and save only this setting.
 
+    .PARAMETER SettingValue
+    The name of the individual setting to save. If provided, the function will update and save only this setting.
+
     .PARAMETER Encoding
     The encoding to be used when saving the configuration data. The default is UTF8.
 
@@ -337,6 +343,8 @@ function Save-PAFConfiguration {
 
         [string]$settingName = $null,
 
+        [string]$settingValue = $null,
+
         [string]$encoding = 'UTF8'
     )
   
@@ -356,7 +364,7 @@ function Save-PAFConfiguration {
         }
 
         if (-not $configFilePath) {
-            $configFilePath = "${PSScriptRoot}\config.json"
+            $configFilePath = "${PSScriptRoot}\config\config.json"
         }
 
         if (-not $configData) {
@@ -374,24 +382,49 @@ function Save-PAFConfiguration {
 
         if ($settingName -ne $null) {
             # Check if the provided setting is a valid setting in the configuration
-            if ($validSettings -contains $settingName) {
+            if (($validSettings -contains $settingName) -and ($null -eq $settingValue)) {
                 # Prompt the user to enter the new value for the setting
                 $newValue = Read-Host "Enter the new value for setting '$settingName'"
-
+    
                 # Update the value of the setting in the configuration data
                 $configData.$settingName = $newValue
-
+    
                 # Save the entire updated configuration data to the configuration file
                 $jsonConfig = $configData | ConvertTo-Json -Depth 10
-
+    
                 # Save the JSON data to the configuration file
                 $jsonConfig | Set-Content -Path $configFilePath -Encoding $encoding
-
+    
                 Write-Host "Setting '$settingName' updated and saved to '$configFilePath'."
+
+
+            }
+            elseif ($null -ne $settingValue) {
+                # Update the value of the setting in the configuration data
+                if (-not(Test-PAFRequiredProperty -Object $configData -Setting $settingName)) {
+                    $configData | Add-Member -MemberType NoteProperty -Name $settingName -Value $settingValue
+                    Write-Information "Adding '$settingName' updated with value '$settingValue' and saved to '$configFilePath'." -InformationAction Continue
+                }
+                else {
+                    $configData.$settingName = $settingValue
+                    Write-Information "Setting '$settingName' updated with new value '$settingValue' and saved to '$configFilePath'." -InformationAction Continue
+                }
+    
+                # Save the entire updated configuration data to the configuration file
+                $jsonConfig = $configData | ConvertTo-Json -Depth 10
+    
+                # Save the JSON data to the configuration file
+                $jsonConfig | Set-Content -Path $configFilePath -Encoding $encoding
+    
+
+                return
             }
             else {
                 Write-Error "Setting '$settingName' not found in the configuration data."
+                return Get-PAFDefaultConfiguration
+
             }
+    
         }
         else {
             # Save the entire configuration data to the configuration file
@@ -521,7 +554,7 @@ function Show-PAFSnippetMenu {
     .NOTES
     The Show-PAFSnippetMenu function uses the following helper functions to perform its tasks:
     - Get-PAFSnippets: Retrieves the list of snippets from the specified snippets paths.
-    - Show-SnippetExecutionMenu: Displays the menu for executing selected snippets.
+    - Show-PAFSnippetExecutionMenu: Displays the menu for executing selected snippets.
     - Convert-FirstLetterToUpper: Helper function to capitalize the first letter of a string.
 
     The menu will keep running until the user decides to exit manually.
@@ -565,7 +598,7 @@ function Show-PAFSnippetMenu {
                 return
             }
             else {
-                Show-SnippetExecutionMenu -Snippets $matchedSnippets
+                Show-PAFSnippetExecutionMenu -Snippets $matchedSnippets
                 return
             }
         }
@@ -581,8 +614,9 @@ function Show-PAFSnippetMenu {
                 $categories = ($script:cachedSnippets | Select-Object -ExpandProperty Category -Unique)
             }
             else {
-                $categories += (Load-Snippets -Path $usersnippetsPath | Select-Object -ExpandProperty Category -Unique)
-                $categories += (Load-Snippets -Path $systemsnippetsPath | Select-Object -ExpandProperty Category -Unique)
+                $categories += (Load-Snippets -Path $usersnippetsPath)
+                $categories += (Load-Snippets -Path $systemsnippetsPath)
+                $categories = $categories | Select-Object -ExpandProperty Category -Unique
             }            
 
             if ($categories.Count -eq 0) {
@@ -590,7 +624,7 @@ function Show-PAFSnippetMenu {
                 return
             }
 
-            $categorySelection = $categories | ForEach-Object { $_ }
+            [array]$categorySelection = $categories | ForEach-Object { $_ }
             $categorySelection += "All Categories"
 
             do {
@@ -603,17 +637,24 @@ function Show-PAFSnippetMenu {
 
                 switch ($menuChoice) {
                     1 {
-                        $Category = Show-CategorySelectionMenu -CategorySelection $categorySelection
+                        $Category = Show-PAFCategorySelectionMenu -CategorySelection $categorySelection
                         if ($Category -eq "All Categories") {
                             <# $allSnippets = @(
                                 (Load-Snippets -Path $usersnippetsPath),
                                 (Load-Snippets -Path $systemsnippetsPath)
                             ) #>
                             $allSnippets = @()
-                            $allSnippets += (Load-Snippets -Path $usersnippetsPath)
-                            $allSnippets += (Load-Snippets -Path $systemsnippetsPath)
-                            
-                            Show-SnippetExecutionMenu -Snippets $allSnippets
+                            if ($script:cachedSnippets -eq 0) {
+                                
+                                $allSnippets += (Load-Snippets -Path $usersnippetsPath)
+                                $allSnippets += (Load-Snippets -Path $systemsnippetsPath)
+                            }
+                            else {
+                                $allSnippets = $script:cachedSnippets
+                            }
+                            if ((Show-PAFSnippetExecutionMenu -Snippets $allSnippets) -eq "x") {
+                                #$Category = Show-PAFCategorySelectionMenu -CategorySelection ([array]$categorySelection)
+                            }
                         }
                         else {
                             <#                             $categorySnippets = @(
@@ -621,14 +662,19 @@ function Show-PAFSnippetMenu {
                                 (Load-Snippets -Path $systemsnippetsPath | Where-Object { $_.Category -eq $Category })
                             ) #>
                             $categorySnippets = @()
-                            $categorySnippets += (Load-Snippets -Path $usersnippetsPath | Where-Object { $_.Category -eq $Category })
-                            $categorySnippets += (Load-Snippets -Path $systemsnippetsPath | Where-Object { $_.Category -eq $Category })
-                            
+                            $categorySnippets += (Load-Snippets -Path $usersnippetsPath)
+                            $categorySnippets += (Load-Snippets -Path $systemsnippetsPath)
+                            $categorySnippets = $categorySnippets | Where-Object { $_.Category -eq $Category }
+
                             if ($categorySnippets.Count -eq 0) {
                                 Write-Host "No snippets found in the '$Category' category."
                             }
                             else {
-                                Show-SnippetExecutionMenu -Snippets $categorySnippets
+                                
+                                if ((Show-PAFSnippetExecutionMenu -Snippets $categorySnippets) -eq "x") {
+                                    #$Category = Show-PAFCategorySelectionMenu -CategorySelection ([array]$categorySelection)
+                                }
+    
                             }
                         }
                         break
@@ -653,7 +699,7 @@ function Show-PAFSnippetMenu {
     }
 }
 
-function Show-CategorySelectionMenu {
+function Show-PAFCategorySelectionMenu {
     param (
         [Parameter(Mandatory = $true)]
         [array]$CategorySelection
@@ -677,7 +723,7 @@ function Show-CategorySelectionMenu {
     } while ($true)
 }
 
-function Show-SnippetExecutionMenu {
+function Show-PAFSnippetExecutionMenu {
     param (
         [Parameter(Mandatory = $true)]
         [array]$Snippets
@@ -691,7 +737,11 @@ function Show-SnippetExecutionMenu {
             Write-Host "$($i + 1). $($Snippets[$i].Name) - $($Snippets[$i].Synopsis)"
         }
         Write-Host "X. Go back to the main menu"
-        [int]$menuChoice = Read-Host "Enter the number corresponding to the snippet to execute or 'X' to go back"
+        $menuChoice = Read-Host "Enter the number corresponding to the snippet to execute or 'X' to go back"
+
+        if (-not ($menuChoice -eq "X" -or $menuChoice -eq "x")) {
+            [int]$menuChoice
+        }
 
         if ($menuChoice -ge 1 -and ($menuChoice -le $($Snippets.Count))) {
             $selectedSnippet = $Snippets[$menuChoice - 1]
@@ -705,7 +755,7 @@ function Show-SnippetExecutionMenu {
             
         }
         elseif ($menuChoice -eq "X" -or $menuChoice -eq "x") {
-            return
+            return $menuChoice
         }
         else {
             Write-Warning "Invalid menu choice. Please select a valid snippet or 'X' to go back."
@@ -825,10 +875,26 @@ https://github.com/voytas75/PowershellFramework
 The GitHub repository for the PowerShell Awesome Framework.
 #>
     try {
+
         $configData = Get-PAFConfiguration
         if ($null -eq $configData) {
             Write-Error "Failed to load configuration. Exiting PAF."
             return
+        }
+
+        # Add missing settings to config
+        $configdataDefault = Get-PAFDefaultConfiguration
+        #$requiredProperties = @("FrameworkName", "DefaultModulePath", "SnippetsPath", "UserSnippetsPath", "MaxSnippetsPerPage", "ShowBannerOnStartup", "FrameworkPrefix", "ShowExampleSnippets")
+        $requiredProperties = [array]($configdataDefault.Keys)
+
+        foreach ($configDataItem in $requiredProperties) {
+            # if no key in config then add it with default value
+            # Check if all required properties are present in the configuration data
+            if (-not (Test-PAFRequiredProperty -Object $ConfigData -Setting $configDataItem )) {
+                Write-Information "Missing required property '$configDataItem'. Using default value '$($configdataDefault[$configDataItem])'." -InformationAction Continue
+                Save-PAFConfiguration -settingName $configDataItem -settingValue $configdataDefault[$configDataItem]
+            }
+
         }
 
         $usersnippetsPath = $configData.UserSnippetsPath
@@ -836,7 +902,7 @@ The GitHub repository for the PowerShell Awesome Framework.
         $frameworkPrefix = $configData.FrameworkPrefix
 
         if ($configData.ShowBannerOnStartup -and $null -eq $bannerShowed ) {
-            get-banner
+            Get-PAFBanner
             $bannerShowed = $true
         }
 
@@ -847,7 +913,12 @@ The GitHub repository for the PowerShell Awesome Framework.
                 # Caching snippets to avoid repeated file I/O
                 $script:cachedSnippets = @()
                 $script:cachedSnippets += (Get-PAFSnippets -snippetsPath $usersnippetsPath -frameworkPrefix $frameworkPrefix)
-                $script:cachedSnippets += (Get-PAFSnippets -snippetsPath $systemsnippetsPath -frameworkPrefix $frameworkPrefix)
+                if ($configData.ShowExampleSnippets -eq "true") {
+                    $script:cachedSnippets += (Get-PAFSnippets -snippetsPath $systemsnippetsPath -frameworkPrefix $frameworkPrefix)
+                }
+                else {
+                    $script:cachedSnippets += (Get-PAFSnippets -snippetsPath $systemsnippetsPath -frameworkPrefix $frameworkPrefix) | Where-Object { $_.category -ne "Example" }
+                }
             }
             #Show-PAFSnippetMenu -UserSnippets $usersnippetsPath -SystemSnippets $systemsnippetsPath -frameworkPrefix $frameworkPrefix
             $exitSnippetMenu = Show-PAFSnippetMenu -frameworkPrefix $frameworkPrefix
@@ -859,7 +930,7 @@ The GitHub repository for the PowerShell Awesome Framework.
 }
 
 # Function to display the PowerShell Awesome Framework banner
-function Get-Banner {
+function Get-PAFBanner {
     param (
         
     )

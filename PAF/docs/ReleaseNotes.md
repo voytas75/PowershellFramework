@@ -12,7 +12,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ### Changed
 
-- n/a
+- [#12](https://github.com/voytas75/PowershellFramework/issues/12)
+- [#13](https://github.com/voytas75/PowershellFramework/issues/13)
 
 ## [0.2.4] - 2023.08.05
 
