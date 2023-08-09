@@ -13,22 +13,14 @@ The [PowerShell Awesome Framework](https://www.powershellgallery.com/packages/PA
 ## Features
 
 1. **Customizable Settings**: The framework includes a JSON configuration file `config.json` that is automatically generated when you run the `Start-PAF` command for the first time. This configuration file allows users to modify settings and personalize the framework's behavior to suit their preferences and workflow. You can easily adjust the framework's options to match your unique coding needs by editing the settings in the config.json file.
-
 2. **User-Specific Snippets:** Store your custom snippets in an additional folder path, distinct from the core framework snippets. This feature allows you to maintain personalized code without affecting the core functionality.
-
 3. **Dynamic Snippet Loading:** The framework dynamically loads snippets from both the main path (specified in the configuration file) and the user-specific snippets folder. Access all available snippets from one centralized location.
-
 4. **Organized Menu System:** The framework presents snippets in a compact and organized menu, categorized based on their functionality. Quickly browse through categories and snippets to find the desired functionality effortlessly.
-
 5. **Pagination for Large Collections:** Manage a large number of snippets efficiently with built-in pagination. Navigate through multiple pages of snippets with ease, enabling access to a vast array of functionalities.
-
 6. **Keyword-Based Search:** Utilize the search functionality to filter snippets based on keywords. Perform quick searches to locate specific snippets within extensive collections.
-
-7. **REMOVED:** *Color Output Option:* Choose your preferred visual representation by enabling or disabling color output in the menu. Adapt the framework to match your terminal settings and preferences.
-
-8. **Startup Banner Option:** Decide whether to display a startup banner when loading the framework. Customize the banner to display essential information or updates.
-
-9. **Snippet Filtering:** Easily refine your snippet selection through a user-friendly filtering feature, enabling precise access to the code functionalities you need. Added in 0.2.5.
+7. **Startup Banner Option:** Decide whether to display a startup banner when loading the framework. Customize the banner to display essential information or updates.
+8. **Snippet Filtering:** Easily refine your snippet selection through a user-friendly filtering feature, enabling precise access to the code functionalities you need. Added in 0.2.5.
+9. **REMOVED:** *Color Output Option:* Choose your preferred visual representation by enabling or disabling color output in the menu. Adapt the framework to match your terminal settings and preferences.
 
 ### Aspects' ideas
 
