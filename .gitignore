@@ -1,2 +1,2 @@
 *.out
-config\config.json
+/PAF/config/config.json
