@@ -9,6 +9,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 ### Added
 
 - add `bye bye` on exit
+- show information message on import
 
 ### Changed
 
