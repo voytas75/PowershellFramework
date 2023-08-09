@@ -20,25 +20,26 @@
     VariablesToExport = '*'
     #ScriptsToProcess  = "Set-PAFConfigFile.ps1"
     # Private data to pass to the module specified in RootModule/ModuleToProcess. This may also contain a PSData hashtable with additional module metadata used by PowerShell.
+    # This script block will be executed when the module is imported
     PrivateData       = @{
 
         PSData = @{
     
             # Tags applied to this module. These help with module discovery in online galleries.
-            Tags       = @(
+            Tags         = @(
                 "Framework",
                 "snippet"
 
             )
     
             # A URL to the license for this module.
-            LicenseUri = 'https://github.com/voytas75/PowershellFramework/blob/master/LICENSE'
+            LicenseUri   = 'https://github.com/voytas75/PowershellFramework/blob/master/LICENSE'
     
             # A URL to the main website for this project.
-            ProjectUri = 'https://github.com/voytas75/PowershellFramework'
+            ProjectUri   = 'https://github.com/voytas75/PowershellFramework'
     
             # A URL to an icon representing this module.
-            IconUri = 'https://raw.githubusercontent.com/voytas75/PowershellFramework/master/PAF/images/PAF.PNG'
+            IconUri      = 'https://raw.githubusercontent.com/voytas75/PowershellFramework/master/PAF/images/PAF.PNG'
     
             # ReleaseNotes of this module
             ReleaseNotes = '/docs/ReleaseNotes.md'

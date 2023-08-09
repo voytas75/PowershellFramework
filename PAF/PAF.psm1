@@ -912,18 +912,18 @@ The GitHub repository for the PowerShell Awesome Framework.
 
         while ($exitSnippetMenu -ne 3) {
             
-            if ($script:cachedSnippets.Length -eq 0) {
+            #if ($script:cachedSnippets.Length -eq 0) {
     
                 # Caching snippets to avoid repeated file I/O
                 $script:cachedSnippets = @()
                 $script:cachedSnippets += (Get-PAFSnippets -snippetsPath $usersnippetsPath -frameworkPrefix $frameworkPrefix)
-                if ($configData.ShowExampleSnippets -eq "true") {
+                if ($configData.ShowExampleSnippets) {
                     $script:cachedSnippets += (Get-PAFSnippets -snippetsPath $systemsnippetsPath -frameworkPrefix $frameworkPrefix)
                 }
                 else {
                     $script:cachedSnippets += (Get-PAFSnippets -snippetsPath $systemsnippetsPath -frameworkPrefix $frameworkPrefix) | Where-Object { $_.category -ne "Example" }
                 }
-            }
+            #}
             #Show-PAFSnippetMenu -UserSnippets $usersnippetsPath -SystemSnippets $systemsnippetsPath -frameworkPrefix $frameworkPrefix
             $exitSnippetMenu = Show-PAFSnippetMenu -frameworkPrefix $frameworkPrefix
         }
@@ -971,6 +971,17 @@ try {
 catch {
     Write-Error "An error occurred while checking for updates: $_"
 }
+
+
+#write-host ($MyInvocation | ConvertTo-Json )
+
+Write-Host "Welcome to Powershell Awesome Framework!" -ForegroundColor DarkYellow
+Write-Host "Thank you for using PAF ($($moduleVersion))." -ForegroundColor Yellow
+#Write-Host "Module Version: $($moduleVersion)." -ForegroundColor Yellow
+Write-Host "Some important changes and informations that may be of interest to you:" -ForegroundColor Yellow
+Write-Host "- You can filter the built-in snippets (category: 'Example') by setting 'ShowExampleSnippets' to '`$false' in config. Use: 'Save-PAFConfiguration -settingName ""ShowExampleSnippets"" -settingValue `$false'" -ForegroundColor Yellow
+#Write-Host "2. Bug B fixed" -ForegroundColor DarkYellow
+# Add more changes as needed
 
 # Restore the original TLS security protocol
 #[Net.ServicePointManager]::SecurityProtocol = $oldProtocol
