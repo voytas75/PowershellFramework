@@ -13,9 +13,10 @@
 6. **Snippet Path Management**: Users can configure the location of their personal snippet path, where they store their custom functions. This makes it easy for users to organize and maintain their functions in their preferred location.
     - Snippet Path Choice: A user may want to keep their custom functions in a specific directory on their system, and this option allows them to configure the snippet path accordingly.
 7. **Logging mechanism** for tracking function execution and troubleshooting.
-8. **Function Export and Import**. This functionality will enable users to export their custom functions to files for sharing and backup purposes. It will also allow users to import functions from files or online repositories, expanding the library of available functions and promoting community collaboration.
-9. **Export and import** capability for user functions and categories.
-10. **PowerShell Function Importer**
+8. **Module's logging** and error handling capabilities. Users may want to track the execution of their functions and identify any issues.
+9. **Function Export and Import**. This functionality will enable users to export their custom functions to files for sharing and backup purposes. It will also allow users to import functions from files or online repositories, expanding the library of available functions and promoting community collaboration.
+10. **Export and import** capability for user functions and categories.
+11. **PowerShell Function Importer**
 
     **Description**: Develop a PowerShell Function Importer functionality within the PAF module. This feature will allow users to easily import functions from external PowerShell modules or script files into the PAF's managed environment. Users can specify the path to the module or script file, and the importer will automatically integrate the functions into the PAF's function management system.
 
@@ -25,9 +26,8 @@
     - Function Version Control: The importer can help manage different versions of imported functions, avoiding conflicts and ensuring proper versioning.
     - Increased Module Compatibility: By enabling the import of external functions, the PAF becomes more versatile and compatible with a wider range of PowerShell resources.
 
-11. **User feedback** and bug reporting mechanism.
-12. **Interactive tutorial** mode to assist beginners in using the module.
-13. **Module's logging** and error handling capabilities. Users may want to track the execution of their functions and identify any issues.
+12. **User feedback** and bug reporting mechanism.
+13. **Interactive tutorial** mode to assist beginners in using the module.
 14. **Comprehensive and user-friendly documentation with examples.**
 
 ## Others
