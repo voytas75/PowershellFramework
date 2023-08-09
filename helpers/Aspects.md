@@ -7,17 +7,16 @@
 1. **Configuration Wizard**: Implement a guided configuration wizard that helps users set up the module easily by specifying the configurable path and other settings.
 2. **Function Output Format**: Allow users to configure the default output format for function results, such as plain text, JSON, or HTML.
 3. **Function Execution History**: Track and display the execution history of user functions, allowing users to review past runs and results.
-4. **User-defined aliases** for functions.
-5. **Auto-Start Behavior**: Users can specify whether the framework should automatically start with the menu displayed, the interactive code playground, or a custom dashboard. This saves time by opening the most relevant view upon launching the framework.
-    - Default Category: If a user frequently works with data manipulation functions, they can set the "Data Manipulation" category as their default, saving them time and navigation steps.
-6. **Snippet Path Management**: Users can configure the location of their personal snippet path, where they store their custom functions. This makes it easy for users to organize and maintain their functions in their preferred location.
-    - Snippet Path Choice: A user may want to keep their custom functions in a specific directory on their system, and this option allows them to configure the snippet path accordingly.
-7. **Logging mechanism** for tracking function execution and troubleshooting.
-8. **Module's logging** and error handling capabilities. Users may want to track the execution of their functions and identify any issues.
+4. **Logging mechanism** for tracking function execution and troubleshooting.
+5. **Module's logging** and error handling capabilities. Users may want to track the execution of their functions and identify any issues.
+6. **User-defined aliases** for functions.
+7. **Auto-Start Behavior**: Users can specify whether the framework should automatically start with the menu displayed, the interactive code playground, or a custom dashboard. This saves time by opening the most relevant view upon launching the framework.
+   - Default Category: If a user frequently works with data manipulation functions, they can set the "Data Manipulation" category as their default, saving them time and navigation steps.
+8. **Snippet Path Management**: Users can configure the location of their personal snippet path, where they store their custom functions. This makes it easy for users to organize and maintain their functions in their preferred location.
+   - Snippet Path Choice: A user may want to keep their custom functions in a specific directory on their system, and this option allows them to configure the snippet path accordingly
 9. **Function Export and Import**. This functionality will enable users to export their custom functions to files for sharing and backup purposes. It will also allow users to import functions from files or online repositories, expanding the library of available functions and promoting community collaboration.
 10. **Export and import** capability for user functions and categories.
 11. **PowerShell Function Importer**
-
     **Description**: Develop a PowerShell Function Importer functionality within the PAF module. This feature will allow users to easily import functions from external PowerShell modules or script files into the PAF's managed environment. Users can specify the path to the module or script file, and the importer will automatically integrate the functions into the PAF's function management system.
 
     *Benefits*
@@ -25,7 +24,6 @@
     - Enhanced Function Reusability: With the ability to import functions, users can leverage a broader range of existing code and extend their PowerShell capabilities.
     - Function Version Control: The importer can help manage different versions of imported functions, avoiding conflicts and ensuring proper versioning.
     - Increased Module Compatibility: By enabling the import of external functions, the PAF becomes more versatile and compatible with a wider range of PowerShell resources.
-
 12. **User feedback** and bug reporting mechanism.
 13. **Interactive tutorial** mode to assist beginners in using the module.
 14. **Comprehensive and user-friendly documentation with examples.**
