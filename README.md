@@ -28,6 +28,8 @@ The [PowerShell Awesome Framework](https://www.powershellgallery.com/packages/PA
 
 8. **Startup Banner Option:** Decide whether to display a startup banner when loading the framework. Customize the banner to display essential information or updates.
 
+9. **Snippet Filtering:** Easily refine your snippet selection through a user-friendly filtering feature, enabling precise access to the code functionalities you need. Added in 0.2.5.
+
 ### Aspects' ideas
 
 [Aspects' ideas](./helpers/Aspects.md)
