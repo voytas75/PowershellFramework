@@ -17,6 +17,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - [#13](https://github.com/voytas75/PowershellFramework/issues/13)
 - [#18](https://github.com/voytas75/PowershellFramework/issues/18)
 - [#19](https://github.com/voytas75/PowershellFramework/issues/19)
+- fix for `ShowExampleSnippets` type in config
+- fix the order of loading config
 
 ## [0.2.4] - 2023.08.05
 
