@@ -28,6 +28,10 @@ The [PowerShell Awesome Framework](https://www.powershellgallery.com/packages/PA
 
 8. **Startup Banner Option:** Decide whether to display a startup banner when loading the framework. Customize the banner to display essential information or updates.
 
+### Aspects' ideas
+
+[Aspects' ideas](./helpers/Aspects.md)
+
 ## Installation and Usage
 
 The module is available on [PowerShell Gallery](https://www.powershellgallery.com/packages/PAF).
@@ -119,10 +123,6 @@ To prepare a function snippet for adding it to the PowerShell Awesome Module use
    Once the snippet file is ready, add it to the user snippets folder where it belongs. For example, if the snippet is for a function called `Get-Example`, it would be placed in the `PAF_Get-Example.ps1` file inside the `$([Environment]::GetFolderPath("MyDocuments"))\PowerShell Awesome Framework\user_snippets\` folder.
 
 By following these steps, you can contribute function snippets to the PowerShell Awesome Module effectively. Ensure that your snippets adhere to the guidelines mentioned above for consistency and compatibility with the module.
-
-## Aspects' ideas
-
-[Aspects' ideas](./helpers/Aspects.md)
 
 ## Versioning
 
