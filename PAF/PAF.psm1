@@ -893,7 +893,10 @@ The GitHub repository for the PowerShell Awesome Framework.
             # Check if all required properties are present in the configuration data
             if (-not (Test-PAFRequiredProperty -Object $ConfigData -Setting $configDataItem )) {
                 Write-Information "Missing required property '$configDataItem'. Using default value '$($configdataDefault[$configDataItem])'." -InformationAction Continue
+                # use [array] for value setting to kee type (i.e $true for 'ShowExampleSnippets')
                 Save-PAFConfiguration -settingName $configDataItem -settingValue ([array]$($configdataDefault[$configDataItem]))
+                # read config again with new setting
+                $configData = Get-PAFConfiguration
             }
 
         }
