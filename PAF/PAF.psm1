@@ -954,7 +954,7 @@ function Get-PAFBanner {
 $ModuleName = "PAF"
 
 # Get the installed version of the module
-$ModuleVersion = [version]"0.2.5"
+$ModuleVersion = [version]"0.2.6"
 
 # Find the latest version of the module in the PSGallery repository
 $LatestModule = Find-Module -Name $ModuleName -Repository PSGallery
