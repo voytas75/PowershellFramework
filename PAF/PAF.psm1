@@ -614,8 +614,9 @@ function Show-PAFSnippetMenu {
                 $categories = ($script:cachedSnippets | Select-Object -ExpandProperty Category -Unique)
             }
             else {
-                $categories += (Load-Snippets -Path $usersnippetsPath | Select-Object -ExpandProperty Category -Unique)
-                $categories += (Load-Snippets -Path $systemsnippetsPath | Select-Object -ExpandProperty Category -Unique)
+                $categories += (Load-Snippets -Path $usersnippetsPath)
+                $categories += (Load-Snippets -Path $systemsnippetsPath)
+                $categories = $categories | Select-Object -ExpandProperty Category -Unique
             }            
 
             if ($categories.Count -eq 0) {
@@ -652,7 +653,7 @@ function Show-PAFSnippetMenu {
                                 $allSnippets = $script:cachedSnippets
                             }
                             if ((Show-PAFSnippetExecutionMenu -Snippets $allSnippets) -eq "x") {
-                                Show-PAFCategorySelectionMenu -CategorySelection ([array]$Category += "All Categories")
+                                #$Category = Show-PAFCategorySelectionMenu -CategorySelection ([array]$categorySelection)
                             }
                         }
                         else {
@@ -661,16 +662,17 @@ function Show-PAFSnippetMenu {
                                 (Load-Snippets -Path $systemsnippetsPath | Where-Object { $_.Category -eq $Category })
                             ) #>
                             $categorySnippets = @()
-                            $categorySnippets += (Load-Snippets -Path $usersnippetsPath | Where-Object { $_.Category -eq $Category })
-                            $categorySnippets += (Load-Snippets -Path $systemsnippetsPath | Where-Object { $_.Category -eq $Category })
-                            
+                            $categorySnippets += (Load-Snippets -Path $usersnippetsPath)
+                            $categorySnippets += (Load-Snippets -Path $systemsnippetsPath)
+                            $categorySnippets = $categorySnippets | Where-Object { $_.Category -eq $Category }
+
                             if ($categorySnippets.Count -eq 0) {
                                 Write-Host "No snippets found in the '$Category' category."
                             }
                             else {
                                 
                                 if ((Show-PAFSnippetExecutionMenu -Snippets $categorySnippets) -eq "x") {
-                                    Show-PAFCategorySelectionMenu -CategorySelection ([array]$Category += "All Categories")
+                                    #$Category = Show-PAFCategorySelectionMenu -CategorySelection ([array]$categorySelection)
                                 }
     
                             }
