@@ -343,7 +343,7 @@ function Save-PAFConfiguration {
 
         [string]$settingName = $null,
 
-        [string]$settingValue = $null,
+        [array]$settingValue = $null,
 
         [string]$encoding = 'UTF8'
     )
@@ -382,7 +382,7 @@ function Save-PAFConfiguration {
 
         if ($settingName -ne $null) {
             # Check if the provided setting is a valid setting in the configuration
-            if (($validSettings -contains $settingName) -and ($null -eq $settingValue)) {
+            if (($validSettings -contains $settingName) -and ($null -eq $settingValue[0])) {
                 # Prompt the user to enter the new value for the setting
                 $newValue = Read-Host "Enter the new value for setting '$settingName'"
     
@@ -399,15 +399,15 @@ function Save-PAFConfiguration {
 
 
             }
-            elseif ($null -ne $settingValue) {
+            elseif ($null -ne $settingValue[0]) {
                 # Update the value of the setting in the configuration data
                 if (-not(Test-PAFRequiredProperty -Object $configData -Setting $settingName)) {
-                    $configData | Add-Member -MemberType NoteProperty -Name $settingName -Value $settingValue
-                    Write-Information "Adding '$settingName' updated with value '$settingValue' and saved to '$configFilePath'." -InformationAction Continue
+                    $configData | Add-Member -MemberType NoteProperty -Name $settingName -Value $settingValue[0]
+                    Write-Information "Adding '$settingName' updated with value '$($settingValue[0])' and saved to '$configFilePath'." -InformationAction Continue
                 }
                 else {
-                    $configData.$settingName = $settingValue
-                    Write-Information "Setting '$settingName' updated with new value '$settingValue' and saved to '$configFilePath'." -InformationAction Continue
+                    $configData.$settingName = $settingValue[0]
+                    Write-Information "Setting '$settingName' updated with new value '$($settingValue[0])' and saved to '$configFilePath'." -InformationAction Continue
                 }
     
                 # Save the entire updated configuration data to the configuration file
@@ -807,7 +807,7 @@ function Get-PAFScriptBlockInfo {
                 return $functionName.trimEnd()
             }
             "Category" {
-                return (Convert-FirstLetterToUpper -InputString $category).trimEnd()
+                return (Convert-PAFFirstLetterToUpper -InputString $category).trimEnd()
                 #return $category
             }
             default {
@@ -829,7 +829,7 @@ function Get-PAFScriptBlockInfo {
     return $null
 }
 
-function Convert-FirstLetterToUpper {
+function Convert-PAFFirstLetterToUpper {
     param (
         [string]$InputString
     )
@@ -893,7 +893,7 @@ The GitHub repository for the PowerShell Awesome Framework.
             # Check if all required properties are present in the configuration data
             if (-not (Test-PAFRequiredProperty -Object $ConfigData -Setting $configDataItem )) {
                 Write-Information "Missing required property '$configDataItem'. Using default value '$($configdataDefault[$configDataItem])'." -InformationAction Continue
-                Save-PAFConfiguration -settingName $configDataItem -settingValue $configdataDefault[$configDataItem]
+                Save-PAFConfiguration -settingName $configDataItem -settingValue ([array]$($configdataDefault[$configDataItem]))
             }
 
         }
