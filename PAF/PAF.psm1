@@ -685,6 +685,7 @@ function Show-PAFSnippetMenu {
                         break
                     }
                     3 {
+                        Write-Host "bye bye" -ForegroundColor Green
                         return 3
                     }
                     default {
