@@ -942,7 +942,7 @@ function Get-PAFBanner {
 }
 
 # Save the current TLS security protocol to restore it later
-$oldProtocol = [Net.ServicePointManager]::SecurityProtocol
+#$oldProtocol = [Net.ServicePointManager]::SecurityProtocol
 
 # Switch to using TLS 1.2
 [Net.ServicePointManager]::SecurityProtocol = [Net.ServicePointManager]::SecurityProtocol -bor [Net.SecurityProtocolType]::Tls12
