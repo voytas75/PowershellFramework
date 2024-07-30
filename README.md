@@ -4,7 +4,7 @@
 
 [![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/A0A6KYBUS)
 
-[![status](https://img.shields.io/badge/PROD-v0.2.5-green)](https://github.com/voytas75/PowershellFramework/blob/master/PAF/docs/ReleaseNotes.md) &nbsp; [![PowerShell Gallery Version (including pre-releases)](https://img.shields.io/powershellgallery/v/PAF)](https://www.powershellgallery.com/packages/PAF) &nbsp; [![PowerShell Gallery](https://img.shields.io/powershellgallery/dt/PAF)](https://www.powershellgallery.com/packages/PAF)
+[![status](https://img.shields.io/badge/PROD-v0.2.5-green)](https://github.com/voytas75/PowershellFramework/blob/master/PAF/docs/ReleaseNotes.md) &nbsp; [![PowerShell Gallery Version (including pre-releases)](https://img.shields.io/powershellgallery/v/PAF)](https://www.powershellgallery.com/packages/PAF) &nbsp; [![PowerShell Gallery](https://img.shields.io/powershellgallery/dt/PAF)](https://www.powershellgallery.com/packages/PAF) &nbsp; [![Codacy Badge](https://app.codacy.com/project/badge/Grade/a1fa5605dd41474ea822d3d8a0783639)](https://app.codacy.com/gh/voytas75/PowershellFramework/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade)
 
 [![status](https://img.shields.io/badge/DEV-v0.2.6-red)](https://github.com/voytas75/PowershellFramework/blob/master/PAF/docs/ReleaseNotes.md)
 
